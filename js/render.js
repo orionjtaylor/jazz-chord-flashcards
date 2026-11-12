@@ -104,8 +104,11 @@
     }
     // crop the viewBox to the content so the staff fills its panel
     const ys = sorted.map((n) => yOf(n.d));
-    const top = Math.min(yOf(38) - 30, ...ys.map((y) => y - 14));
-    const bot = Math.max(yOf(30) + (notes.octaveClef > 0 ? 38 : 26), ...ys.map((y) => y + 14));
+    // The treble-clef glyph (64px Noto Music) reaches ~1.33em above its baseline and ~0.4em below,
+    // so always keep that whole height (plus a little air) inside the crop.
+    const clefTop = yOf(32) - 64 * 1.34 - 5, clefBot = yOf(32) + 64 * 0.4 + 5;
+    const top = Math.min(clefTop, ...ys.map((y) => y - 14));
+    const bot = Math.max(clefBot, yOf(30) + (notes.octaveClef > 0 ? 38 : 26), ...ys.map((y) => y + 14));
     return s.replace(`viewBox="0 0 ${W} ${HT}"`, `viewBox="0 ${top} ${W} ${bot - top}"`) + '</svg>';
   }
 
