@@ -8,6 +8,7 @@ A static website for practicing jazz chords: 81 chord types in 9 families (major
 - **Hear it**: ear training. The chord plays and you identify the quality. Replay it or play it as an arpeggio.
 - **Progressions**: ii–V–I, minor ii–V–i, turnarounds, tritone sub, backdoor, Coltrane cycle, jazz blues and more, in any key. Work out each chord from its Roman numeral, then reveal it and play it back with smooth voice leading.
 - **Slash & upper-structure chords**: hybrids like F/G, D/C and D♭/C, plus triads over dominants (D/C7, E♭/C7, A♭/C7…) drawn as stacked polychords. The upper triad is colored separately, and each shows what it's equivalent to (e.g. F/G ≈ G9sus4).
+- **Learn**: an illustrated guide to how chords are built, how to read a chord symbol, and what defines each of the 9 chord families (sound, typical use, symbols, tips), with playable examples and a cheat sheet.
 - **Library**: browse every chord in any key with notation, keyboard, inversions, audio and scales that fit it.
 - Correct enharmonic spelling (C°7 = C E♭ G♭ B𝄫), synthesized piano audio, spaced repetition (chords you miss come up more often), and progress saved in the browser.
 
@@ -40,6 +41,7 @@ js/theory.js      chords, scales, progressions, spelling and voicing
 js/render.js      SVG staff, keyboard, chord symbols
 js/audio.js       Web Audio piano synth with reverb
 js/app.js         practice modes, spaced repetition, library, settings
+js/learn.js       the Learn guide (family explanations and examples)
 js/pwa.js         service worker registration and Install button
 sw.js             offline cache (service worker)
 manifest.webmanifest, icons/   app name, colors and home-screen icons

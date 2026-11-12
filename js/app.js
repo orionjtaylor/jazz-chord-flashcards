@@ -490,8 +490,27 @@
     });
     $('#view-practice').hidden = v !== 'practice';
     $('#view-library').hidden = v !== 'library';
+    $('#view-learn').hidden = v !== 'learn';
     if (v === 'library') renderLibrary();
+    else if (v === 'learn') mountLearn();
     else renderStats();
+    window.scrollTo(0, 0);
+  }
+
+  let learnMounted = false;
+  function mountLearn() {
+    if (learnMounted || !window.Learn) return;
+    learnMounted = true;
+    window.Learn.mount($('#view-learn'), {
+      play: (notes, arp) => play(notes, arp),
+      openChord: (root, id) => {
+        S.libRoot = root; S.libChord = id; S.libInv = 0; save();
+        setView('library');
+        play(libNotes());
+        if (window.matchMedia('(max-width: 900px)').matches) $('#lib-detail').scrollIntoView({ block: 'start' });
+        else $(`.tile[data-chord="${CSS.escape(id)}"]`)?.scrollIntoView({ block: 'center' });
+      },
+    });
   }
 
   function renderSound() {

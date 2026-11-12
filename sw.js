@@ -1,10 +1,10 @@
 /* Service worker: makes the app work offline.
    Strategy: serve from cache instantly, refresh the cache in the background
    (stale-while-revalidate), so updates appear on the next launch. */
-const CACHE = 'changes-v2';
+const CACHE = 'changes-v3';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest',
-  'css/styles.css', 'js/theory.js', 'js/render.js', 'js/audio.js', 'js/app.js', 'js/pwa.js',
+  'css/styles.css', 'js/theory.js', 'js/render.js', 'js/audio.js', 'js/app.js', 'js/pwa.js', 'js/learn.js',
   'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png',
 ];
 
