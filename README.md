@@ -13,6 +13,13 @@ A static website for practicing jazz chords: 81 chord types in 9 families (major
 
 Keyboard shortcuts: `Space` flip/play · `1`–`4` answer · `Enter` next · `P` play · `M` mute
 
+## Install as an app
+The site is an installable web app (PWA) and works offline after the first visit.
+- **iPhone/iPad (Safari):** Share → Add to Home Screen, or tap the site's **Install** button for instructions.
+- **Android / Chrome / Edge:** tap **Install** in the header (or the browser's install icon).
+
+When you deploy changes, bump `CACHE` in `sw.js` (e.g. `changes-v2` → `changes-v3`) so installed copies drop the old files. Updates show up the next time the app is opened.
+
 ## Run locally
 No build step. Open `index.html` directly, or serve the folder:
 
@@ -33,5 +40,8 @@ js/theory.js      chords, scales, progressions, spelling and voicing
 js/render.js      SVG staff, keyboard, chord symbols
 js/audio.js       Web Audio piano synth with reverb
 js/app.js         practice modes, spaced repetition, library, settings
+js/pwa.js         service worker registration and Install button
+sw.js             offline cache (service worker)
+manifest.webmanifest, icons/   app name, colors and home-screen icons
 ```
 To add a chord, add a line to `CHORDS` in `js/theory.js` (and its scales in `CHORD_SCALES`). To add a progression, add a line to `PROGRESSIONS`.
