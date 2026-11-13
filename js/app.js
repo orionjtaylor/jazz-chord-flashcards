@@ -110,7 +110,7 @@
         <p class="prompt">${card.inv
           ? `Spell all ${notes.length} notes, bass note first, and say <b>which inversion</b> it is.`
           : `Spell it. Name all ${notes.length} notes.`}</p>
-        <span class="flip-hint"><kbd>Space</kbd> or tap to flip</span>
+        <span class="flip-hint"><span class="kb-only"><kbd>Space</kbd> or tap</span><span class="touch-only">Tap</span> to flip</span>
       </div>`;
     }
     if (S.mode === 'name') {
