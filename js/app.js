@@ -405,6 +405,7 @@
   // ───────────────────────── Deck dialog
   function deckCount() {
     $('#deck-count').textContent = `${pool().length} chords · ${roots().length} keys${S.inv !== 'off' ? ' · inversions' : ''}`;
+    $('#deck-fams').innerHTML = T.CATEGORIES.filter((c) => S.cats.includes(c.id)).map((c) => `<i style="background:${c.color}" title="${c.label}"></i>`).join('');
   }
 
   function renderDialog() {
@@ -481,8 +482,45 @@
       </div>`;
   }
 
-  function setView(v) {
+  // ───────────────────────── Routing: real addresses for each section
+  const ROUTES = { practice: '/', learn: '/learn', library: '/library' };
+  const TITLES = { practice: 'Changes — Jazz Chord Flashcards', learn: 'Learn: How Jazz Chords Work · Changes', library: 'Chord Library · Changes' };
+  function viewFromPath(path) {
+    const p = path.replace(/\/+$/, '').replace(/\.html$/, '').toLowerCase();
+    if (p.endsWith('/learn')) return 'learn';
+    if (p.endsWith('/library')) return 'library';
+    return 'practice';
+  }
+  function urlFor(v) {
+    if (v !== 'library') return ROUTES[v] + (v === 'learn' ? location.hash : '');
+    const q = new URLSearchParams({ key: S.libRoot, chord: S.libChord });
+    return `${ROUTES.library}?${q}`;
+  }
+  /** Keep the address bar and tab title in sync with what's on screen. */
+  function syncUrl(push) {
+    const url = urlFor(view);
+    if (url !== location.pathname + location.search + location.hash) history[push ? 'pushState' : 'replaceState']({ view }, '', url);
+    if (view === 'library') {
+      const c = T.CHORDS.find((x) => x.id === S.libChord);
+      document.title = c ? `${T.prettyRoot(S.libRoot)}${c.upper ? ' ' + c.rel : T.pretty(c.sym || '')} · Chord Library · Changes` : TITLES.library;
+    } else document.title = TITLES[view];
+  }
+  /** Apply the current address (on load and on Back/Forward). */
+  function route() {
+    const v = viewFromPath(location.pathname);
+    if (v === 'library') {
+      const q = new URLSearchParams(location.search);
+      const key = q.get('key'), chord = q.get('chord');
+      if (key && T.ROOT_NAMES.includes(key)) S.libRoot = key;
+      if (chord && T.CHORDS.some((c) => c.id === chord)) { S.libChord = chord; S.libInv = 0; }
+      save();
+    }
+    setView(v, { push: false });
+  }
+
+  function setView(v, { push = true } = {}) {
     view = v;
+    document.body.dataset.view = v;
     stopTimers();
     $$('.tab').forEach((t) => {
       t.classList.toggle('active', t.dataset.view === v);
@@ -494,7 +532,10 @@
     if (v === 'library') renderLibrary();
     else if (v === 'learn') mountLearn();
     else renderStats();
-    window.scrollTo(0, 0);
+    syncUrl(push);
+    const target = v === 'learn' && location.hash ? document.getElementById('learn-' + location.hash.slice(1)) || document.querySelector(location.hash) : null;
+    if (target) requestAnimationFrame(() => target.scrollIntoView({ block: 'start' }));
+    else window.scrollTo(0, 0);
   }
 
   let learnMounted = false;
@@ -520,8 +561,14 @@
   }
 
   // ───────────────────────── Events
-  $$('.tab').forEach((t) => t.addEventListener('click', () => setView(t.dataset.view)));
-  $('.brand').addEventListener('click', (e) => { e.preventDefault(); setView('practice'); });
+  // nav links: normal clicks switch in place; ⌘/Ctrl/middle-click still open a new tab
+  $$('.tab, .brand').forEach((t) => t.addEventListener('click', (e) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    e.preventDefault();
+    if (t.dataset.view === 'learn' && view !== 'learn') history.replaceState(history.state, '', location.pathname + location.search); // drop any old #section
+    if (t.dataset.view !== view) setView(t.dataset.view);
+  }));
+  window.addEventListener('popstate', route);
   $$('#mode-seg button').forEach((b) => b.addEventListener('click', () => setMode(b.dataset.mode)));
   $('#sound-btn').addEventListener('click', () => { S.sound = !S.sound; save(); renderSound(); });
 
@@ -582,12 +629,12 @@
 
   $('#lib-roots').addEventListener('click', (e) => {
     const b = e.target.closest('[data-libroot]');
-    if (b) { S.libRoot = b.dataset.libroot; save(); renderLibrary(); }
+    if (b) { S.libRoot = b.dataset.libroot; save(); renderLibrary(); syncUrl(false); }
   });
   $('#lib-cats').addEventListener('click', (e) => {
     const b = e.target.closest('[data-chord]');
     if (!b) return;
-    S.libChord = b.dataset.chord; S.libInv = 0; save();
+    S.libChord = b.dataset.chord; S.libInv = 0; save(); syncUrl(false);
     $$('.tile').forEach((t) => { const on = t === b; t.classList.toggle('sel', on); t.setAttribute('aria-pressed', on); });
     renderDetail();
     play(libNotes());
@@ -633,5 +680,6 @@
   deckCount();
   renderStats();
   setMode(S.mode);
+  route();
   document.fonts?.ready.then(() => sizeCard());
 })();

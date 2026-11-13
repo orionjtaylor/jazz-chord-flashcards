@@ -248,7 +248,12 @@
       const o = e.target.closest('[data-open]');
       if (o) return api.openChord(root, o.dataset.open);
       const a = e.target.closest('.learn-toc a');
-      if (a) { e.preventDefault(); el.querySelector(a.getAttribute('href')).scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+      if (a) {
+        e.preventDefault();
+        const id = a.getAttribute('href').slice(1);
+        el.querySelector('#' + id).scrollIntoView({ behavior: 'smooth', block: 'start' });
+        history.replaceState(history.state, '', `${location.pathname}#${id.replace(/^learn-/, '')}`);
+      }
     });
     // highlight the contents entry for the section on screen
     let spy = null;

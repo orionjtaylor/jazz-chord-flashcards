@@ -920,3 +920,54 @@ main { padding-left: max(clamp(16px, 4vw, 48px), env(safe-area-inset-left)); pad
 @media (min-width: 1240px) { .mode-hint { background: var(--ink-2); } }
 /* interval labels on the staff: a paper-colored halo so staff lines don't strike through them */
 .staff .st-label { paint-order: stroke; stroke: #fbf6ea; stroke-width: 4px; stroke-linejoin: round; }
+
+/* ───────── Wide-screen left column: one unified panel (modes → deck → shortcuts) */
+.deck-fams, .deck-edit, .rail-keys { display: none; }
+@media (min-width: 1240px) {
+  .toolbar {
+    gap: 0; padding: 8px; background: var(--ink-2); border: 1px solid var(--line); border-radius: 18px;
+  }
+  .toolbar .seg { background: none; border: 0; padding: 0; border-radius: 0; }
+  .toolbar .deck-btn {
+    margin: 8px 0 0; padding: 14px 12px; width: 100%; min-width: 0; background: none; border: 0; border-radius: 12px;
+    position: relative; align-items: flex-start;
+  }
+  .toolbar .deck-btn::before { content: ''; position: absolute; left: 6px; right: 6px; top: -4px; height: 1px; background: var(--line); }
+  .toolbar .deck-btn:hover { background: var(--hover); }
+  .deck-text { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+  .deck-fams { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 7px; }
+  .deck-fams i { width: 9px; height: 9px; border-radius: 50%; }
+  .deck-edit { display: block; font-size: 12px; font-weight: 700; color: var(--gold-text); align-self: center; }
+  .deck-edit::after { content: ' ›'; }
+  .deck-stack { margin-top: 2px; }
+
+  .rail-keys {
+    display: grid; grid-template-columns: 1fr; gap: 7px; margin: auto 0 0; padding: 14px 12px 8px; position: relative;
+    font-size: 12.5px; color: var(--muted);
+  }
+  .rail-keys::before { content: ''; position: absolute; left: 6px; right: 6px; top: 0; height: 1px; background: var(--line); }
+  .rail-keys dt { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; font-weight: 700; margin-bottom: 2px; }
+  .rail-keys dd { margin: 0; display: flex; align-items: center; gap: 2px; }
+  .rail-keys dd kbd { margin: 0; opacity: 0.8; }
+  .rail-keys dd span { margin-left: auto; }
+  /* the shortcuts live in the panel now, so the footer doesn't repeat them on Practice */
+  body[data-view="practice"] .foot { display: none; }
+}
+
+/* Installed iPhone app: iOS blurs the strip under the status bar (and a little below it),
+   so give the header extra room there. Browser tabs are unaffected. */
+@media (display-mode: standalone) and (max-width: 700px) {
+  .top { padding-top: calc(env(safe-area-inset-top) + 14px); }
+}
+@media (min-width: 1240px) {
+  .toolbar .seg button { padding: 9px 14px; }
+  .toolbar .deck-btn { display: grid; grid-template-columns: auto 1fr auto; column-gap: 12px; align-items: start; padding: 12px; }
+  .deck-edit { align-self: start; margin-top: 1px; }
+  .deck-fams { flex-wrap: nowrap; gap: 4px; }
+  .deck-fams i { width: 8px; height: 8px; flex: none; }
+  .rail-keys { grid-template-columns: 1fr 1fr; gap: 8px 10px; padding: 12px 12px 6px; }
+  .rail-keys dt { grid-column: 1 / -1; }
+  .rail-keys dd { gap: 6px; font-size: 12px; }
+  .rail-keys dd span { margin-left: 0; }
+}
+@media (min-width: 1240px) { .rail-keys dd { white-space: nowrap; } .face { min-height: 490px; } }

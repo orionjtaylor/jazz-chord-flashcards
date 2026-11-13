@@ -11,7 +11,7 @@
       location.reload();
     });
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+      navigator.serviceWorker.register('/sw.js', { scope: '/', updateViaCache: 'none' })
         .then((reg) => reg.update())
         .catch(() => {});
     });

@@ -23,6 +23,11 @@ The site is an installable web app (PWA) and works offline after the first visit
 
 When you deploy changes, bump `CACHE` in `sw.js` (e.g. `changes-v2` → `changes-v3`) so installed copies drop the old files. Updates show up the next time the app is opened.
 
+## Pages and addresses
+Each section has its own address: `/` (Practice), `/learn` (with `#section` anchors) and `/library` (with `?key=Eb&chord=maj7`).
+GitHub Pages only serves files that exist, so `learn.html`, `library.html` and `404.html` are generated copies of `index.html`.
+**After editing `index.html`, run `python3 scripts/build-pages.py`** to regenerate them.
+
 ## Run locally
 No build step. Open `index.html` directly, or serve the folder:
 

@@ -1,9 +1,8 @@
-/* Light/dark theme: follows the device setting until the user picks one with the toggle.
+/* Light/dark theme: dark by default; the toggle switches and the choice is remembered.
    Loaded in <head> so the right theme is applied before the page paints (no flash). */
 (function () {
   const KEY = 'changes.theme';
   const root = document.documentElement;
-  const sys = window.matchMedia('(prefers-color-scheme: light)');
   const saved = () => { try { return localStorage.getItem(KEY); } catch { return null; } };
   const apply = (t) => {
     root.dataset.theme = t;
@@ -16,9 +15,7 @@
       btn.setAttribute('aria-label', `Switch to ${next} mode`);
     }
   };
-  apply(saved() || (sys.matches ? 'light' : 'dark'));
-  // follow the device if the user hasn't chosen
-  sys.addEventListener('change', (e) => { if (!saved()) apply(e.matches ? 'light' : 'dark'); });
+  apply(saved() || 'dark');
   document.addEventListener('DOMContentLoaded', () => {
     apply(root.dataset.theme);
     document.getElementById('theme-btn')?.addEventListener('click', () => {
