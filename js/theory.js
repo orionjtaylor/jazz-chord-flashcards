@@ -101,7 +101,7 @@
     C('maj7b5', 'maj7b5', 'Major seven flat five', 'major', ['1', '3', 'b5', '7'], ['Δ7♭5', 'maj7(♭5)'], 'A Lydian sound with the ♯11 (♭5) replacing the 5th.'),
     C('69#11', '6/9#11', 'Six-nine sharp eleven', 'major', ['1', '3', '5', '6', '9', '#11'], ['6/9(♯11)'], 'A Lydian tonic without the major 7th. A favorite final chord.'),
     C('mb6', 'm(b6)', 'Minor flat six', 'minor', ['1', 'b3', '5', 'b6'], ['-♭6', 'm(♯5)'], 'Aeolian minor. The ♭6 moving to 5 drives many minor-key lines.'),
-    C('m7b9', 'm7b9', 'Minor seven flat nine', 'minor', ['1', 'b3', '5', 'b7', 'b9'], ['-7♭9', 'Phrygian'], 'The Phrygian minor chord, as on the iii of a major key.'),
+    C('m7b9', 'm7b9', 'Minor seven flat nine', 'minor', ['1', 'b3', '5', 'b7', 'b9'], ['-7♭9', 'mi7(♭9)'], 'The Phrygian minor chord, as on the iii of a major key.'),
     C('m7#5', 'm7#5', 'Minor seven sharp five', 'minor', ['1', 'b3', '#5', 'b7'], ['-7♯5', 'm7(♭13)'], 'Aeolian color. It sounds like a major 7 chord in first inversion.'),
     C('7add13', '7(13)', 'Dominant seven add thirteen', 'dominant', ['1', '3', '5', 'b7', '13'], ['7/6', '7add13'], 'A dominant with the 13th but no 9th. Common in big-band voicings.'),
     C('9b5', '9b5', 'Dominant nine flat five', 'dominant', ['1', '3', 'b5', 'b7', '9'], ['9(♭5)', '9♯11 (no 5)'], 'From the whole-tone scale, also heard as a Lydian dominant.'),
