@@ -217,10 +217,28 @@
   function sizeCard() {
     if (!card) return;
     const inner = $('.card-inner');
-    const h = (card.flipped ? $('#back') : $('#front')).scrollHeight;
+    const el = $('#card');
+    let h;
+    if (card.kind === 'chord' && window.matchMedia('(min-width: 1240px)').matches) {
+      // laptops: one fixed height fitted to the screen, so flipping (or the next card) never
+      // changes the layout; a tall back scrolls inside the card instead
+      // screen height minus nav bar, page padding and the answer row (fixed, so it never wobbles)
+      h = Math.round(Math.max(420, Math.min(640, window.innerHeight - (S.mode === 'spell' ? 210 : 248))));
+      el.classList.add('fixed-h');
+    } else {
+      el.classList.remove('fixed-h');
+      h = (card.flipped ? $('#back') : $('#front')).scrollHeight;
+    }
     inner.style.height = h + 'px';
     inner.style.setProperty('--h', h + 'px');
+    requestAnimationFrame(updateScrollCue);
   }
+  function updateScrollCue() {
+    const back = $('#back');
+    const more = $('#card').classList.contains('fixed-h') && back.scrollHeight - back.clientHeight - back.scrollTop > 4;
+    back.classList.toggle('has-more', more);
+  }
+  $('#back').addEventListener('scroll', updateScrollCue, { passive: true });
   window.addEventListener('resize', () => sizeCard());
 
   function flip() {
@@ -406,7 +424,8 @@
 
   // ───────────────────────── Deck dialog
   function deckCount() {
-    $('#deck-count').textContent = `${pool().length} chords · ${roots().length} keys${S.inv !== 'off' ? ' · inversions' : ''}`;
+    const inv = { off: '', mix: 'Inversions mixed in', only: 'Inversions only' }[S.inv];
+    $('#deck-count').innerHTML = `<span>${pool().length} chords · ${roots().length} keys</span>${inv ? `<span class="deck-inv">${inv}</span>` : ''}`;
     $('#deck-fams').innerHTML = T.CATEGORIES.filter((c) => S.cats.includes(c.id)).map((c) => `<i style="background:${c.color}" title="${c.label}"></i>`).join('');
   }
 

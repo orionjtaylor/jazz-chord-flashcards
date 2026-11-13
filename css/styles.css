@@ -642,7 +642,7 @@ main { padding-left: max(clamp(16px, 4vw, 48px), env(safe-area-inset-left)); pad
 .ex-tabs button.on { background: var(--paper-ink); color: var(--paper); border-color: var(--paper-ink); }
 .ex-tabs button .sym.poly { font-size: 0.7em; }
 .ex-title { font-family: var(--f-display); font-stretch: 78%; font-weight: 800; text-transform: uppercase; font-size: 16px; }
-.ex-title span { font-family: var(--f-ui); text-transform: none; font-weight: 600; font-size: 12.5px; color: var(--paper-muted); margin-left: 4px; }
+.ex-title .ex-equiv { font-family: var(--f-ui); text-transform: none; font-weight: 600; font-size: 12.5px; color: var(--paper-muted); }
 .fam-ex .pills .pill { min-width: 46px; padding: 6px 8px 5px; }
 .fam-ex .pill b { font-size: 18px; }
 .fam-ex .vis-staff, .fam-ex .vis-keys { background: rgba(255, 255, 255, 0.55); }
@@ -1094,4 +1094,94 @@ html { scrollbar-gutter: stable; }
   .front-spell { min-height: 220px; }
   .big-sym { font-size: clamp(64px, 18vw, 110px); }
   main { padding-top: 10px; }
+}
+
+/* laptops: fixed-height card; the back scrolls inside instead of stretching the page */
+@media (min-width: 1240px) {
+  .card.fixed-h .face { height: var(--h); min-height: 0; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(28, 26, 22, 0.25) transparent; }
+  .card.fixed-h .front { justify-content: center; }
+  .card.fixed-h .front-spell { min-height: 0; }
+  /* the colored spine as an inset shadow so it stays put while the back scrolls */
+  .card.fixed-h .face::before { display: none; }
+  .card.fixed-h .front { box-shadow: inset 12px 0 0 var(--front-c, var(--gold)), 0 1px 0 rgba(255, 255, 255, 0.6) inset, var(--card-shadow); }
+  .card.fixed-h .back { box-shadow: inset 12px 0 0 var(--c), 0 1px 0 rgba(255, 255, 255, 0.6) inset, var(--card-shadow); }
+}
+@media (min-width: 1240px) {
+  #controls { min-height: 60px; align-content: start; }
+  #controls .btn { height: 56px; }
+}
+@media (min-width: 1240px) {
+  /* Name it / Hear it: "Next card" joins the choices row, so answering doesn't change its height */
+  #controls.choices { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; align-items: stretch; }
+  #controls.choices.answered { grid-template-columns: minmax(0, 1fr) auto; }
+  #controls.choices .choice-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  #controls.choices .next { margin: 0; height: auto; min-width: 0; width: auto; padding: 0 20px; flex-direction: column; gap: 4px; }
+  #controls.choices .next kbd { margin: 0; }
+  #controls .btn.miss, #controls .btn.got { flex: 1 1 0; }
+  #controls:not(.choices) { flex-wrap: nowrap; }
+}
+/* deck summary: two clean lines instead of a mid-phrase wrap */
+.deck-btn small span { display: block; white-space: nowrap; }
+.deck-inv { opacity: 0.85; }
+@media (max-width: 1239px) { .deck-btn small span { display: inline; } .deck-btn small .deck-inv::before { content: ' · '; } }
+@media (min-width: 1240px) {
+  /* Hear it: one-line names keep the answer row a constant height */
+  #controls .choice { min-height: 96px; }
+  #controls .choice-name { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+  /* soft fade at the bottom of the card back when there's more to scroll */
+  .card.fixed-h .back.has-more { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 44px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 44px), transparent); }
+}
+
+/* ───────── Evenness pass: no ragged mixed-style rows, no stranded words, single-line labels */
+h1, h2, h3, .prog-name, .lib-title { text-wrap: balance; }
+p, dd, .desc, small { text-wrap: pretty; }
+.btn, .chip, .tag, kbd, th, .tab span, .mini-actions button, .link-btn, .seg button b, .seg button small, .deck-btn b, .equiv, .inv-name { white-space: nowrap; }
+
+/* card back: symbol + title stay side by side on wide cards; description above the play buttons */
+@media (min-width: 701px) {
+  .back-head { flex-wrap: nowrap; gap: 20px; }
+  .back-sym { flex: none; }
+  .back-title { min-width: 0; }
+  .back-title h2 { font-size: clamp(18px, 2vw, 24px); }
+}
+.back-foot { flex-direction: column; align-items: flex-start; gap: 12px; }
+.back-foot .desc { max-width: none; }
+
+/* Learn tip: badge in its own column, text wraps cleanly beside it */
+.fam-tip { display: flex; gap: 12px; align-items: baseline; }
+.fam-tip b { flex: none; margin: 0; }
+.fam-tip p { margin: 0; }
+
+/* Learn example title: the "≈ equivalent" sits on its own line */
+.ex-title .ex-equiv { display: block; margin: 2px 0 0; }
+
+/* deck summary inside the laptop panel wraps as whole phrases */
+.deck-btn small span { white-space: normal; }
+
+/* phone polish */
+@media (max-width: 360px) { .seg button b { font-size: 12px; } .seg button { padding: 8px 2px 7px; } }
+@media (max-width: 700px) {
+  .dialog-row { flex-wrap: nowrap; gap: 8px; }
+  .mini-actions { gap: 4px; }
+  .mini-actions button { padding: 4px 9px; font-size: 11.5px; }
+  .dialog-row:has(.dialog-note) { flex-wrap: wrap; }
+}
+/* tablet header: drop the subtitle where it can't fit on one line */
+@media (min-width: 701px) and (max-width: 1100px) { .brand-sub { display: none; } }
+/* deck button on laptops: "Edit ›" floats top-right so the summary gets the full width */
+@media (min-width: 1240px) {
+  .toolbar .deck-btn { grid-template-columns: auto 1fr; }
+  .toolbar .deck-edit { position: absolute; top: 14px; right: 12px; }
+  .deck-btn small span:first-child { white-space: nowrap; }
+}
+/* tiny phones: the Deck popup footer buttons fit side by side */
+@media (max-width: 360px) {
+  .dialog-foot .btn { padding: 11px 14px; font-size: 14px; }
+  .dialog-foot .link-btn { font-size: 12px; }
+}
+@media (max-width: 420px) {
+  .detail-card { padding: 22px 16px 18px 26px; }
+  .inv-switch { align-self: stretch; }
+  .inv-switch button { flex: 1; padding: 6px 4px; }
+  .scales ul { grid-template-columns: 1fr; }
 }

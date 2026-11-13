@@ -112,7 +112,7 @@
         const c = chordById(x);
         return `<button role="tab" aria-selected="${x === id}" class="${x === id ? 'on' : ''}" data-ex="${fam.cat}:${x}">${R.symHTML(root, c)}</button>`;
       }).join('')}</div>
-      <div class="ex-title">${T.title(root, chord)}${chord.equiv ? ` <span>≈ ${chord.equiv}</span>` : ''}</div>
+      <div class="ex-title">${T.title(root, chord)}${chord.equiv ? `<span class="ex-equiv">≈ ${chord.equiv}</span>` : ''}</div>
       ${R.notePills(notes)}
       <div class="vis-staff">${R.staffSVG(notes, { labels: true })}</div>
       <div class="vis-keys">${R.keyboardSVG(notes)}</div>
@@ -143,7 +143,7 @@
         </dl>
         <div class="fam-ex" data-fam="${fam.cat}">${exampleHTML(fam)}</div>
       </div>
-      <p class="fam-tip"><b>Tip</b>${fam.tip}</p>
+      <div class="fam-tip"><b>Tip</b><p>${fam.tip}</p></div>
       <div class="fam-members">
         <span>All ${members.length} in the library</span>
         ${members.map((c) => `<button class="mchip" data-open="${c.id}" title="${c.name}">${R.symHTML(root, c)}</button>`).join('')}
