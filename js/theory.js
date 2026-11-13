@@ -18,12 +18,12 @@
     { id: 'major', label: 'Major', color: '#f2b134' },
     { id: 'minor', label: 'Minor', color: '#3fb8af' },
     { id: 'dominant', label: 'Dominant', color: '#e8553d' },
-    { id: 'altered', label: 'Altered Dominant', color: '#d6407f' },
-    { id: 'sus', label: 'Suspended', color: '#94b447' },
-    { id: 'dim', label: 'Diminished & Half-Dim', color: '#8b7cf6' },
-    { id: 'aug', label: 'Augmented', color: '#4fa3e3' },
-    { id: 'slash', label: 'Slash & Hybrid', color: '#ff8c42' },
-    { id: 'upper', label: 'Upper Structures', color: '#9fd3ff' },
+    { id: 'altered', label: 'Altered Dominant', short: 'Altered', color: '#d6407f' },
+    { id: 'sus', label: 'Suspended', short: 'Sus', color: '#94b447' },
+    { id: 'dim', label: 'Diminished & Half-Dim', short: 'Dim', color: '#8b7cf6' },
+    { id: 'aug', label: 'Augmented', short: 'Aug', color: '#4fa3e3' },
+    { id: 'slash', label: 'Slash & Hybrid', short: 'Slash', color: '#ff8c42' },
+    { id: 'upper', label: 'Upper Structures', short: 'Upper', color: '#9fd3ff' },
   ];
 
   const C = (id, sym, name, cat, tokens, alts, desc) => ({ id, sym, name, cat, tokens, alts, desc });

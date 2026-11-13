@@ -973,3 +973,53 @@ main { padding-left: max(clamp(16px, 4vw, 48px), env(safe-area-inset-left)); pad
   .rail-keys dd span { margin-left: 0; }
 }
 @media (min-width: 1240px) { .rail-keys dd { white-space: nowrap; } .face { min-height: 490px; } }
+
+/* Keep the layout from shifting between pages: always reserve the scrollbar's space, so short
+   pages (Practice) and long ones (Learn, Library) have the same width. Phones use overlay
+   scrollbars, so this changes nothing there. */
+html { scrollbar-gutter: stable; }
+@supports not (scrollbar-gutter: stable) { html { overflow-y: scroll; } }
+
+/* ───────── Deck popup: fits without scrolling */
+.dialog { max-height: calc(100dvh - 24px); }
+.dialog-body { gap: 20px; padding: 22px 24px; }
+.dialog-head h2 { font-size: 30px; }
+.dialog-row { margin-bottom: 10px; }
+.dialog-note b { color: var(--text); font-family: var(--f-sym), var(--f-music); }
+.chip.cat { padding: 10px 12px; font-size: 13.5px; }
+.seg-mini button { padding: 9px 8px; }
+.dialog-foot { padding-top: 16px; }
+@media (min-width: 701px) {
+  .dialog { width: min(780px, calc(100vw - 48px)); }
+  .chip-grid.roots { grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 6px; }
+  .chip-grid.roots .chip { min-width: 0; padding: 8px 0; }
+  .chip-grid.cats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 700px) {
+  .dialog-body { gap: 16px; padding: 18px 16px; }
+  .dialog-head h2 { font-size: 26px; }
+  .chip-grid.roots .chip { padding: 6px 0; min-width: 0; font-size: 15px; }
+  .chip-grid.cats { grid-template-columns: 1fr 1fr; gap: 6px; }
+  .chip.cat { padding: 8px 9px; gap: 7px; font-size: 12.5px; line-height: 1.25; }
+  .chip.cat small { font-size: 11px; }
+  .seg-mini button { font-size: 12.5px; padding: 8px 4px; }
+  .dialog-note { font-size: 11px; }
+}
+@media (max-width: 700px) {
+  .chip-grid.roots { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+  .chip.cat { white-space: nowrap; min-width: 0; }
+  .chip.cat small { display: none; }
+  .seg-mini button { white-space: nowrap; font-size: 12px; padding: 8px 2px; }
+  .dialog-row { margin-bottom: 8px; }
+  .dialog-foot { padding-top: 12px; }
+  .dialog-foot .btn { padding: 12px 18px; }
+}
+@media (max-width: 700px) {
+  .chip-grid.cats { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .chip.cat { padding: 8px 8px; gap: 6px; }
+  .chip.cat span { overflow: hidden; text-overflow: ellipsis; }
+  .chip-grid.roots .chip { padding: 5px 0; }
+  .dialog-body { gap: 14px; }
+}
+@media (max-width: 700px) and (max-height: 620px) { .dialog-note { display: none; } }
+@media (max-width: 360px) { .chip.cat { font-size: 12px; padding: 8px 6px; gap: 5px; } }

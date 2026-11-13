@@ -7,7 +7,7 @@
   const MAX_BOX = 5;
 
   const defaults = {
-    mode: 'spell', sound: true, best: 0, inv: 'off',
+    mode: 'spell', sound: true, best: 0, inv: 'mix',
     roots: [...T.ROOT_NAMES], cats: T.CATEGORIES.map((c) => c.id),
     stats: {}, progStats: {}, libRoot: 'C', libChord: 'maj7', libInv: 0,
   };
@@ -23,6 +23,8 @@
     T.CATEGORIES.forEach((c) => { if (!known.includes(c.id) && !S.cats.includes(c.id)) S.cats.push(c.id); });
     S.knownCats = T.CATEGORIES.map((c) => c.id);
   }
+  // inversions became "mixed in" by default; move saved decks over once (changeable in Deck)
+  if (!S.invDefault2) { S.inv = 'mix'; S.invDefault2 = true; }
 
   const session = { streak: 0, seen: 0, right: 0 };
   let card = null;
@@ -414,7 +416,7 @@
     $('#dlg-cats').innerHTML = T.CATEGORIES.map((c) => {
       const n = T.CHORDS.filter((x) => x.cat === c.id).length;
       const on = S.cats.includes(c.id);
-      return `<button type="button" class="chip cat ${on ? 'on' : ''}" style="--c:${c.color}" data-cat="${c.id}" aria-pressed="${on}"><i></i>${c.label}<small>${n}</small></button>`;
+      return `<button type="button" class="chip cat ${on ? 'on' : ''}" style="--c:${c.color}" data-cat="${c.id}" aria-pressed="${on}" aria-label="${c.label}" title="${c.label}"><i></i><span class="lbl-long">${c.label}</span><span class="lbl-short">${c.short || c.label}</span><small>${n}</small></button>`;
     }).join('');
     $$('#dlg-inv button').forEach((b) => { const on = b.dataset.inv === S.inv; b.classList.toggle('on', on); b.setAttribute('aria-checked', on); });
   }
