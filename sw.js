@@ -1,7 +1,7 @@
 /* Service worker: makes the app work offline.
    Strategy: serve from cache instantly, refresh the cache in the background
    (stale-while-revalidate), so updates appear on the next launch. */
-const CACHE = 'changes-v5';
+const CACHE = 'changes-v6';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest',
   'css/styles.css', 'js/theory.js', 'js/render.js', 'js/audio.js', 'js/app.js', 'js/pwa.js', 'js/learn.js',
@@ -9,7 +9,8 @@ const SHELL = [
 ];
 
 self.addEventListener('install', (e) => {
-  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL)).then(() => self.skipWaiting()));
+  // cache: 'reload' bypasses the browser's HTTP cache so a new version never caches old files
+  e.waitUntil(caches.open(CACHE).then((c) => c.addAll(SHELL.map((u) => new Request(u, { cache: 'reload' })))).then(() => self.skipWaiting()));
 });
 
 self.addEventListener('activate', (e) => {

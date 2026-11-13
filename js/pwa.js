@@ -1,7 +1,24 @@
 /* Installable-app support: service worker + "Install" button. */
 (function () {
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
-    window.addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+    // When a new version is deployed, the new service worker takes over and we reload once,
+    // so updates show on the first open instead of the second.
+    const hadController = !!navigator.serviceWorker.controller;
+    let reloaded = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!hadController || reloaded) return; // first install: nothing stale to replace
+      reloaded = true;
+      location.reload();
+    });
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' })
+        .then((reg) => reg.update())
+        .catch(() => {});
+    });
+    // also check for updates when an installed app comes back to the foreground
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible') navigator.serviceWorker.getRegistration().then((r) => r && r.update()).catch(() => {});
+    });
   }
 
   const btn = document.getElementById('install-btn');
