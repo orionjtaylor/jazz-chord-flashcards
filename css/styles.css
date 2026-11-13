@@ -590,15 +590,6 @@ main { padding-left: max(clamp(16px, 4vw, 48px), env(safe-area-inset-left)); pad
 .basic-card p { margin: 0 0 16px; color: #3d382d; font-size: 14.5px; line-height: 1.6; }
 .stack-vis { display: grid; gap: 10px; }
 
-.anatomy { display: grid; grid-template-columns: 0.8fr 0.6fr 0.9fr 1fr; gap: 0; margin-top: 8px; }
-.an-part { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 0 4px; }
-.an-glyph { font-family: var(--f-sym), var(--f-music); font-weight: 800; font-size: 64px; line-height: 1.1; font-variation-settings: 'opsz' 144; }
-.an-1 .an-glyph, .an-2 .an-glyph { font-size: 36px; font-style: italic; font-weight: 600; align-self: center; transform: translateY(-14px); line-height: 2; }
-.an-3 .an-glyph { font-size: 42px; line-height: 1.55; }
-.an-tick { width: 2px; height: 18px; background: var(--paper-ink); opacity: 0.35; margin: 4px 0 8px; }
-.an-part b { font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; }
-.an-0 b { color: var(--coral); } .an-1 b { color: #b07a10; } .an-2 b { color: #c23a73; } .an-3 b { color: #1d7f78; }
-.an-part small { font-size: 12px; color: var(--paper-muted); line-height: 1.35; margin-top: 4px; }
 
 .fam::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 10px; background: var(--c); }
 .fam { padding-left: 40px; scroll-margin-top: 20px; }
@@ -663,10 +654,6 @@ main { padding-left: max(clamp(16px, 4vw, 48px), env(safe-area-inset-left)); pad
   .basic-card { padding: 20px; }
   .fam { padding: 22px 18px 20px 28px; }
   .fam-formula { margin-left: 0; }
-  .an-glyph { font-size: 46px; }
-  .an-1 .an-glyph, .an-2 .an-glyph { font-size: 26px; transform: translateY(-10px); }
-  .an-3 .an-glyph { font-size: 30px; }
-  .an-part small { font-size: 10.5px; }
   .idea-grid { grid-template-columns: 1fr; }
   .tab { padding: 7px 9px; }
 }
@@ -703,3 +690,60 @@ main { padding-left: max(clamp(16px, 4vw, 48px), env(safe-area-inset-left)); pad
   kbd, .kb-only, .foot { display: none !important; }
   .touch-only { display: inline; }
 }
+
+/* ───────── Design polish pass */
+/* chord-symbol anatomy: one intact symbol, color-coded parts, aligned legend */
+.anatomy { --an0: #e8553d; --an1: #b07a10; --an2: #c23a73; --an3: #1d7f78; display: flex; flex-direction: column; gap: 18px; margin-top: 6px; }
+.an-symbol {
+  align-self: center; font-family: var(--f-sym), var(--f-music); font-weight: 800; font-size: 92px; line-height: 1;
+  font-variation-settings: 'opsz' 144; letter-spacing: -0.02em; padding-top: 6px; white-space: nowrap;
+}
+.an-p { display: inline-block; border-bottom: 5px solid currentColor; padding-bottom: 4px; }
+.an-0 { color: var(--an0); } .an-1 { color: var(--an1); } .an-2 { color: var(--an2); } .an-3 { color: var(--an3); }
+.an-sup { display: inline-flex; gap: 0.08em; font-size: 0.48em; font-style: italic; font-weight: 600; vertical-align: top; margin: 0.08em 0.06em 0 0.04em; }
+.an-sup .an-p { border-bottom-width: 4px; padding-bottom: 2px; }
+.an-bass { font-size: 0.56em; font-weight: 700; margin-left: 0.04em; }
+.an-legend { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.an-legend li { display: flex; gap: 10px; align-items: flex-start; background: rgba(255, 255, 255, 0.45); border: 1px solid rgba(28, 26, 22, 0.08); border-radius: 12px; padding: 10px 12px; }
+.an-chip {
+  flex: none; min-width: 34px; height: 34px; padding: 0 6px; display: grid; place-items: center; border-radius: 9px;
+  background: currentColor; font: 800 17px/1 var(--f-sym), var(--f-music);
+}
+.an-legend li .an-chip { color: inherit; }
+.an-legend li.an-0 .an-chip { background: var(--an0); } .an-legend li.an-1 .an-chip { background: var(--an1); }
+.an-legend li.an-2 .an-chip { background: var(--an2); } .an-legend li.an-3 .an-chip { background: var(--an3); }
+.an-chip { color: #fff !important; }
+.an-legend b { display: block; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; }
+.an-legend li.an-0 b { color: var(--an0); } .an-legend li.an-1 b { color: var(--an1); } .an-legend li.an-2 b { color: var(--an2); } .an-legend li.an-3 b { color: var(--an3); }
+.an-legend small { display: block; font-size: 12.5px; line-height: 1.4; color: #4a4436; margin-top: 2px; }
+@media (max-width: 420px) { .an-symbol { font-size: 76px; } .an-legend { grid-template-columns: 1fr; } }
+
+/* Learn contents: active section; swipeable single row on small screens */
+.learn-toc a.active { background: var(--ink-2); color: var(--text); box-shadow: inset 2px 0 0 var(--c, var(--gold)); }
+@media (max-width: 1000px) {
+  .learn-toc { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin: 0 calc(-1 * clamp(16px, 4vw, 48px)); padding: 2px clamp(16px, 4vw, 48px) 6px; scroll-padding-inline: 16px; }
+  .learn-toc::-webkit-scrollbar { display: none; }
+  .learn-toc a { flex: none; white-space: nowrap; }
+  .learn-toc a.active { box-shadow: none; }
+}
+
+/* root pickers: even rows */
+.root-picker { display: grid; grid-template-columns: repeat(12, minmax(0, 1fr)); gap: 6px; width: min(100%, 600px); max-width: none; }
+.root-picker .chip { min-width: 0; padding: 8px 0; }
+@media (max-width: 700px) { .root-picker { grid-template-columns: repeat(6, minmax(0, 1fr)); width: 100%; } }
+
+/* desktop mode bar no longer shifts when the Deck label changes */
+.deck-btn { min-width: 236px; }
+.deck-btn small { white-space: nowrap; }
+@media (max-width: 700px) { .deck-btn { min-width: 0; } }
+
+/* symbols with flats/sharps in secondary text: use the music font for the glyphs */
+.alts span { font-family: var(--f-sym), var(--f-music); }
+.alts span { letter-spacing: 0; }
+
+/* cheat sheet: consistent example chips */
+.cheat .mchip { min-width: 84px; text-align: center; }
+.an-p, .an-sup .an-p { border-bottom: 0; padding-bottom: 0; }
+.an-sup { gap: 0.14em; margin-left: 0.06em; margin-right: 0.1em; }
+.basics .basic-card { display: flex; flex-direction: column; }
+.basics .anatomy { flex: 1; justify-content: center; }

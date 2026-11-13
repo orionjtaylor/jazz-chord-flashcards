@@ -115,7 +115,7 @@
     }
     if (S.mode === 'name') {
       return `<div class="front-name">
-        <span class="tag neutral">${S.inv !== 'off' ? 'What chord is this? Include the bass note' : 'What chord is this?'}</span>
+        <span class="tag neutral">What chord is this?</span>
         <div class="visuals">
           <div class="vis-staff">${R.staffSVG(notes, { highlightRoot: false })}</div>
           <div class="vis-keys">${R.keyboardSVG(notes, { labels: false })}</div>

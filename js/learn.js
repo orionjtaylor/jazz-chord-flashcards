@@ -153,13 +153,16 @@
 
   function anatomyHTML() {
     const parts = [
-      ['G', 'Root', 'The note the chord is built on'],
-      ['7', 'Quality', 'No "maj" or "m" + a 7 = dominant 7th (major 3rd, ♭7)'],
-      ['♭9', 'Alteration', 'A tension added on top, lowered a half step'],
-      ['/B', 'Bass', 'Bass note. B is the 3rd, so this is a 1st inversion'],
+      ['G', 'Root', 'The note the chord is built on.'],
+      ['7', 'Quality', 'A 7 with no "maj" or "m" means dominant 7th: major 3rd and ♭7.'],
+      ['♭9', 'Alteration', 'An added tension, here the 9th lowered a half step.'],
+      ['/B', 'Bass', 'The bass note. B is the 3rd, so this is a 1st inversion.'],
     ];
-    return `<div class="anatomy" aria-label="Parts of the chord symbol G7♭9/B">
-      ${parts.map(([g, k, d], i) => `<div class="an-part an-${i}"><span class="an-glyph">${g}</span><span class="an-tick"></span><b>${k}</b><small>${d}</small></div>`).join('')}
+    return `<div class="anatomy">
+      <div class="an-symbol" role="img" aria-label="G7♭9/B">
+        <span class="an-p an-0">G</span><span class="an-sup"><span class="an-p an-1">7</span><span class="an-p an-2">♭9</span></span><span class="an-p an-3 an-bass">/B</span>
+      </div>
+      <ol class="an-legend">${parts.map(([g, k, d], i) => `<li class="an-${i}"><span class="an-chip">${g}</span><div><b>${k}</b><small>${d}</small></div></li>`).join('')}</ol>
     </div>`;
   }
 
@@ -247,11 +250,28 @@
       const a = e.target.closest('.learn-toc a');
       if (a) { e.preventDefault(); el.querySelector(a.getAttribute('href')).scrollIntoView({ behavior: 'smooth', block: 'start' }); }
     });
+    // highlight the contents entry for the section on screen
+    let spy = null;
+    const watch = () => {
+      spy?.disconnect();
+      if (!('IntersectionObserver' in window)) return;
+      const links = new Map([...el.querySelectorAll('.learn-toc a')].map((l) => [l.getAttribute('href').slice(1), l]));
+      spy = new IntersectionObserver((entries) => {
+        entries.forEach((en) => {
+          if (!en.isIntersecting) return;
+          links.forEach((l) => l.classList.remove('active'));
+          links.get(en.target.id)?.classList.add('active');
+        });
+      }, { rootMargin: '-35% 0px -60% 0px' });
+      links.forEach((_, id) => { const sec = el.querySelector('#' + id); if (sec) spy.observe(sec); });
+    };
+    watch();
     el.addEventListener('change', (e) => {
       if (e.target.id !== 'learn-root') return;
       root = e.target.value;
       const y = window.scrollY;
       render(el);
+      watch();
       window.scrollTo(0, y);
     });
   }
