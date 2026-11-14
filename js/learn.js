@@ -188,6 +188,14 @@
       </div>
 
       <div class="learn-layout">
+        <label class="toc-select-wrap"><span>Jump to</span>
+          <select class="toc-select" aria-label="Jump to section">
+            <option value="learn-basics">The basics</option>
+            ${FAMILIES.map((f) => `<option value="learn-${f.cat}">${T.catOf(f.cat).label}</option>`).join('')}
+            <option value="learn-ideas">Key ideas</option>
+            <option value="learn-table">Cheat sheet</option>
+          </select>
+        </label>
         <nav class="learn-toc" aria-label="Guide contents">
           <a href="#learn-basics">The basics</a>
           ${FAMILIES.map((f) => `<a href="#learn-${f.cat}" style="--c:${T.catOf(f.cat).color}"><i></i>${T.catOf(f.cat).label}</a>`).join('')}
@@ -223,7 +231,7 @@
               <tbody>${FAMILIES.map((f) => {
                 const cat = T.catOf(f.cat);
                 const ex = chordById(f.examples[0]);
-                return `<tr style="--c:${cat.color}"><td><i></i>${cat.label}</td><td>${f.formula.map(fml).join(' ')}</td><td>${f.feel}</td><td>${f.role}</td><td><button class="mchip" data-open="${ex.id}">${R.symHTML(root, ex)}</button></td></tr>`;
+                return `<tr style="--c:${cat.color}"><td class="c-fam"><i></i>${cat.label}</td><td data-label="Formula">${f.formula.map(fml).join(' ')}</td><td data-label="Sound">${f.feel}</td><td data-label="Role">${f.role}</td><td data-label="Example"><button class="mchip" data-open="${ex.id}">${R.symHTML(root, ex)}</button></td></tr>`;
               }).join('')}</tbody>
             </table></div>
           </section>
@@ -255,6 +263,12 @@
         history.replaceState(history.state, '', `${location.pathname}#${id.replace(/^learn-/, '')}`);
       }
     });
+    el.addEventListener('change', (e) => {
+      if (!e.target.classList.contains('toc-select')) return;
+      const id = e.target.value;
+      el.querySelector('#' + id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      history.replaceState(history.state, '', `${location.pathname}#${id.replace(/^learn-/, '')}`);
+    });
     // highlight the contents entry for the section on screen
     let spy = null;
     const watch = () => {
@@ -266,10 +280,20 @@
           if (!en.isIntersecting) return;
           links.forEach((l) => l.classList.remove('active'));
           links.get(en.target.id)?.classList.add('active');
+          const sel = el.querySelector('.toc-select');
+          if (sel && sel.value !== en.target.id && sel.querySelector(`option[value="${en.target.id}"]`)) sel.value = en.target.id;
         });
       }, { rootMargin: '-35% 0px -60% 0px' });
       links.forEach((_, id) => { const sec = el.querySelector('#' + id); if (sec) spy.observe(sec); });
     };
+    // the last sections are too short to reach the middle of the screen; at the bottom, mark the last one
+    window.addEventListener('scroll', () => {
+      if (el.hidden || innerHeight + scrollY < document.documentElement.scrollHeight - 4) return;
+      const last = [...el.querySelectorAll('.learn-toc a')].pop();
+      el.querySelectorAll('.learn-toc a').forEach((l) => l.classList.toggle('active', l === last));
+      const sel = el.querySelector('.toc-select');
+      if (sel) sel.value = last.getAttribute('href').slice(1);
+    }, { passive: true });
     watch();
     el.addEventListener('change', (e) => {
       if (e.target.id !== 'learn-root') return;

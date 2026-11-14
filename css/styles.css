@@ -1280,3 +1280,37 @@ body { transition: opacity 0.18s ease-out; }
   .install-btn { position: static; height: 34px; padding: 0 11px; }
 }
 @media (max-width: 360px) { .install-btn span { display: none; } .install-btn { padding: 0 9px; } }
+
+/* ───────── No sideways scrolling on phones: dropdowns instead of swipe rows; cheat sheet as cards */
+.toc-select-wrap, .fam-select { display: none; }
+.toc-select, .fam-select {
+  -webkit-appearance: none; appearance: none; font: 600 15px var(--f-ui); color: var(--text);
+  background: var(--ink-2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23a39b8a' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 14px center;
+  border: 1px solid var(--line); border-radius: 12px; padding: 11px 40px 11px 14px; width: 100%;
+}
+@media (min-width: 701px) and (max-width: 1000px) {
+  .learn-toc { flex-wrap: wrap; overflow: visible; margin: 0; padding: 0; }
+}
+@media (min-width: 701px) and (max-width: 900px) {
+  .lib-fams { flex-wrap: wrap; overflow: visible; margin: 0; padding: 0; }
+}
+@media (max-width: 700px) {
+  .learn-toc { display: none; }
+  .toc-select-wrap { display: grid; grid-template-columns: auto 1fr; align-items: center; gap: 10px; position: sticky; top: var(--top-h, 55px); z-index: 5; padding: 8px 0; background: var(--ink); }
+  .toc-select-wrap > span { font-size: 11px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+  .lib-fams { display: none; }
+  .fam-select { display: block; }
+
+  /* cheat sheet: one card per family */
+  .table-wrap { overflow: visible; border: 0; border-radius: 0; }
+  .cheat { min-width: 0; background: none; display: block; }
+  .cheat thead { display: none; }
+  .cheat tbody { display: grid; gap: 10px; }
+  .cheat tr { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; padding: 14px 16px; background: var(--ink-2); border: 1px solid var(--line); border-radius: 16px; }
+  .cheat td { display: block; padding: 0; border: 0; }
+  .cheat td.c-fam { grid-column: 1 / -1; font-size: 15px; }
+  .cheat td[data-label]::before { content: attr(data-label); display: block; font: 700 10px var(--f-ui); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); margin-bottom: 2px; }
+}
+:root[data-theme="light"] .toc-select-wrap { background: var(--ink); }
+/* phones: section jumps stop just below the top bar + sticky "Jump to" bar */
+@media (max-width: 700px) { .learn-main > *, .fam { scroll-margin-top: calc(var(--top-h, 55px) + 72px); } }

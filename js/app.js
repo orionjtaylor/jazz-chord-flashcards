@@ -461,6 +461,8 @@
     $('#lib-roots').innerHTML = T.ROOT_NAMES.map((r) =>
       `<button role="radio" aria-checked="${r === S.libRoot}" class="chip ${r === S.libRoot ? 'on' : ''}" data-libroot="${r}">${T.prettyRoot(r)}</button>`).join('');
     const fam = S.libFam && T.CATEGORIES.some((c) => c.id === S.libFam) ? S.libFam : 'all';
+    $('#lib-fam-select').innerHTML = [{ id: 'all', label: 'All families' }, ...T.CATEGORIES].map((c) =>
+      `<option value="${c.id}" ${c.id === fam ? 'selected' : ''}>${c.label}</option>`).join('');
     $('#lib-fams').innerHTML = [{ id: 'all', label: 'All', short: 'All' }, ...T.CATEGORIES].map((c) =>
       `<button role="radio" aria-checked="${c.id === fam}" class="fam-chip ${c.id === fam ? 'on' : ''}" data-libfam="${c.id}" ${c.color ? `style="--c:${c.color}"` : ''} title="${c.label}">${c.color ? '<i></i>' : ''}<span class="lbl-long">${c.label}</span><span class="lbl-short">${c.short || c.label}</span></button>`).join('');
     $('#lib-cats').innerHTML = T.CATEGORIES.filter((cat) => fam === 'all' || cat.id === fam).map((cat) => {
@@ -705,6 +707,7 @@
     const b = e.target.closest('[data-libfam]');
     if (b) { S.libFam = b.dataset.libfam; save(); renderLibrary(); }
   });
+  $('#lib-fam-select').addEventListener('change', (e) => { S.libFam = e.target.value; save(); renderLibrary(); });
   $('#lib-backdrop').addEventListener('click', closeSheet);
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('#lib-detail').classList.contains('open')) closeSheet(); });
   $('#lib-detail').addEventListener('click', (e) => {
@@ -747,6 +750,12 @@
   renderSound();
   deckCount();
   renderStats();
+  // sticky sub-bars (e.g. Learn's "Jump to") sit exactly under the top bar, whatever its height
+  const syncTopH = () => document.documentElement.style.setProperty('--top-h', $('.top').offsetHeight + 'px');
+  syncTopH();
+  window.addEventListener('resize', syncTopH);
+  document.fonts?.ready.then(syncTopH);
+
   setMode('spell'); // a fresh load always starts on Spell it
   route();
   document.fonts?.ready.then(() => sizeCard());
