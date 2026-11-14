@@ -32,7 +32,7 @@ GitHub Pages only serves files that exist, so `learn.html`, `library.html` and `
 No build step. Open `index.html` directly, or serve the folder:
 
 ```sh
-python3 -m http.server 8000   # then visit http://localhost:8000
+python3 scripts/serve.py      # then visit http://127.0.0.1:8765 (behaves like GitHub Pages)
 ```
 
 ## Host it
