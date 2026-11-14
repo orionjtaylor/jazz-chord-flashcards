@@ -64,17 +64,17 @@
     C('7b5', '7b5', 'Dominant seven flat five', 'dominant', ['1', '3', 'b5', 'b7'], ['7(♭5)'], 'Symmetrical: it\'s the same chord a tritone away. Good for tritone substitution.'),
 
     // ── Altered dominant
-    C('7#5', '7#5', 'Augmented seventh', 'altered', ['1', '3', '#5', 'b7'], ['7+', 'aug7', '7(♯5)'], 'Dominant with a raised 5th that leans up toward the next chord\'s 3rd.'),
-    C('9#5', '9#5', 'Augmented ninth', 'altered', ['1', '3', '#5', 'b7', '9'], ['9+', '9(♯5)'], 'From the whole-tone scale: dreamy and unresolved.'),
+    C('7#5', '7#5', 'Augmented seventh', 'altered', ['1', '3', '#5', 'b7'], ['7+', 'aug7', '7(♯5)'], 'Dominant with a raised 5th that leans up toward the next chord\'s 3rd. It\'s augmented (the ♯5) and also counts as altered.'),
+    C('9#5', '9#5', 'Augmented ninth', 'altered', ['1', '3', '#5', 'b7', '9'], ['9+', '9(♯5)'], 'From the whole-tone scale: dreamy and unresolved. Augmented (♯5) and altered.'),
     C('7b9', '7b9', 'Dominant seven flat nine', 'altered', ['1', '3', '5', 'b7', 'b9'], ['7(♭9)'], 'The V7 of minor keys. The ♭9 resolves down by half step to the 5th of the I chord.'),
-    C('7#9', '7#9', 'Dominant seven sharp nine', 'altered', ['1', '3', '5', 'b7', '#9'], ['7(♯9)'], 'Major and minor 3rd together, a gritty blues sound. Known as the "Hendrix chord."'),
-    C('7b13', '7b13', 'Dominant seven flat thirteen', 'altered', ['1', '3', '5', 'b7', 'b13'], ['7(♭13)'], 'A mixolydian ♭6 color. The ♭13 pulls down to the 9 of the next chord.'),
+    C('7#9', '7#9', 'Dominant seven sharp nine', 'altered', ['1', '3', '5', 'b7', '#9'], ['7(♯9)'], 'Major and minor 3rd together, a gritty blues sound. The ♯9 is the signature "alt" color. Known as the "Hendrix chord."'),
+    C('7b13', '7b13', 'Dominant seven flat thirteen', 'altered', ['1', '3', '5', 'b7', 'b13'], ['7(♭13)'], 'Still an altered dominant even with the natural 5th: one altered tension is enough. The ♭13 pulls down to the 9 of the next chord.'),
     C('13b9', '13b9', 'Thirteen flat nine', 'altered', ['1', '3', '5', 'b7', 'b9', '13'], ['13(♭9)'], 'Half-whole diminished sound: the ♭9 and natural 13 together.'),
     C('7b9b13', '7b9b13', 'Seven flat nine flat thirteen', 'altered', ['1', '3', '5', 'b7', 'b9', 'b13'], ['7(♭9♭13)'], 'The Phrygian-dominant V of a minor key, dark and pulling hard toward i.'),
     C('7#9b13', '7#9b13', 'Seven sharp nine flat thirteen', 'altered', ['1', '3', '5', 'b7', '#9', 'b13'], ['7(♯9♭13)'], 'Two altered tensions on top of a full dominant.'),
     C('7b9#11', '7b9#11', 'Seven flat nine sharp eleven', 'altered', ['1', '3', '5', 'b7', 'b9', '#11'], ['7(♭9♯11)'], 'Diminished-scale tensions over a dominant.'),
     C('7#9#11', '7#9#11', 'Seven sharp nine sharp eleven', 'altered', ['1', '3', '5', 'b7', '#9', '#11'], ['7(♯9♯11)'], 'Crunchy and bright with altered tensions.'),
-    C('7alt', '7alt', 'Altered dominant', 'altered', ['1', '3', 'b7', '#9', 'b13'], ['7(alt)', '7♯9♭13'], 'Shorthand for the altered scale (♭9 ♯9 ♯11 ♭13). Shown here in a common voicing: 1 3 ♭7 ♯9 ♭13.'),
+    C('7alt', '7alt', 'Altered dominant', 'altered', ['1', '3', 'b7', '#9', 'b13'], ['7(alt)', '7♯9♭13'], 'A catch-all for a crunchy altered dominant: use any mix of ♭9, ♯9, ♯11 (♭5) and ♭13 (♯5), all from the altered (super Locrian) scale. Shown here in a common voicing: 1 3 ♭7 ♯9 ♭13.'),
 
     // ── Suspended
     C('sus2', 'sus2', 'Suspended second', 'sus', ['1', '2', '5'], ['sus9'], 'The 3rd is replaced by the 2nd, so it is neither major nor minor.'),

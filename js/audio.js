@@ -1,16 +1,28 @@
-/* Tiny Web Audio electric-piano-ish synth with a generated reverb. */
+/* Tiny Web Audio electric-piano-ish synth with a generated reverb.
+   Sound reliability:
+   - Browsers only allow audio after the visitor interacts with the page, so the first tap or key
+     press anywhere "unlocks" audio; after that, automatic playback (e.g. Hear it) works.
+   - On iPhone, Web Audio is normally silenced by the ring/silent switch. Declaring a "playback"
+     audio session (iOS 17+) makes it behave like a music app; older iOS gets a silent
+     media-element nudge that has the same effect. */
 (function () {
-  let ctx, master, wet;
+  let ctx, master, wet, unlocked = false;
 
   function init() {
     if (ctx) return;
-    ctx = new (window.AudioContext || window.webkitAudioContext)();
+    try { if (navigator.audioSession) navigator.audioSession.type = 'playback'; } catch {}
+    ctx = new (window.AudioContext || window.webkitAudioContext)({ latencyHint: 'interactive' });
     const comp = ctx.createDynamicsCompressor();
-    comp.threshold.value = -18;
-    comp.ratio.value = 3;
+    comp.threshold.value = -16;
+    comp.knee.value = 10;
+    comp.ratio.value = 4;
+    comp.attack.value = 0.004;
+    comp.release.value = 0.2;
+    const makeup = ctx.createGain();
+    makeup.gain.value = 1.35; // phone speakers are quiet; the compressor keeps peaks in check
     master = ctx.createGain();
-    master.gain.value = 0.8;
-    master.connect(comp).connect(ctx.destination);
+    master.gain.value = 1;
+    master.connect(comp).connect(makeup).connect(ctx.destination);
 
     // simple convolution reverb from decaying noise
     const len = ctx.sampleRate * 2.2;
@@ -25,6 +37,43 @@
     wet.gain.value = 0.22;
     wet.connect(conv).connect(comp);
   }
+
+  // A 0.1s silent WAV, used once on older iOS to move the page into the "playback" audio category.
+  function silentWavUrl() {
+    const rate = 8000, n = 800, buf = new ArrayBuffer(44 + n), v = new DataView(buf);
+    const w = (o, s) => [...s].forEach((c, i) => v.setUint8(o + i, c.charCodeAt(0)));
+    w(0, 'RIFF'); v.setUint32(4, 36 + n, true); w(8, 'WAVEfmt '); v.setUint32(16, 16, true);
+    v.setUint16(20, 1, true); v.setUint16(22, 1, true); v.setUint32(24, rate, true); v.setUint32(28, rate, true);
+    v.setUint16(32, 1, true); v.setUint16(34, 8, true); w(36, 'data'); v.setUint32(40, n, true);
+    for (let i = 0; i < n; i++) v.setUint8(44 + i, 128);
+    return URL.createObjectURL(new Blob([buf], { type: 'audio/wav' }));
+  }
+
+  /** Called on the first user gesture: create/resume the audio context and prime iOS. */
+  function unlock() {
+    if (unlocked) return;
+    unlocked = true;
+    init();
+    if (ctx.state !== 'running') ctx.resume().catch(() => {});
+    // a one-sample silent buffer fully wakes the audio output on Safari
+    const b = ctx.createBuffer(1, 1, ctx.sampleRate);
+    const src = ctx.createBufferSource();
+    src.buffer = b; src.connect(ctx.destination); src.start(0);
+    if (!navigator.audioSession && /iPhone|iPad|iPod/.test(navigator.userAgent)) {
+      try {
+        const el = new Audio(silentWavUrl());
+        el.setAttribute('playsinline', '');
+        el.setAttribute('x-webkit-airplay', 'deny');
+        el.play().catch(() => {});
+      } catch {}
+    }
+    ['pointerdown', 'touchend', 'keydown'].forEach((t) => document.removeEventListener(t, unlock, true));
+  }
+  ['pointerdown', 'touchend', 'keydown'].forEach((t) => document.addEventListener(t, unlock, true));
+  // coming back to the app (e.g. after locking the phone) can suspend audio; wake it again
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && ctx && ctx.state !== 'running') ctx.resume().catch(() => {});
+  });
 
   const freq = (m) => 440 * Math.pow(2, (m - 69) / 12);
 
@@ -54,7 +103,7 @@
       return o;
     });
 
-    const peak = 0.16 * vel;
+    const peak = 0.2 * vel;
     out.gain.setValueAtTime(0.0001, t);
     out.gain.exponentialRampToValueAtTime(peak, t + 0.006);
     out.gain.exponentialRampToValueAtTime(peak * 0.45, t + 0.35);
@@ -68,7 +117,7 @@
   /** Play MIDI notes as a chord (slight strum) or arpeggio. */
   function play(midis, { arp = false } = {}) {
     init();
-    if (ctx.state === 'suspended') ctx.resume();
+    if (ctx.state !== 'running') ctx.resume().catch(() => {});
     const sorted = [...midis].sort((a, b) => a - b);
     const t0 = ctx.currentTime + 0.03;
     const vel = 1 / Math.sqrt(sorted.length) * 1.6;
@@ -81,5 +130,8 @@
     return arp ? sorted.length * 200 + 1200 : 2400;
   }
 
-  window.JazzAudio = { play };
+  /** True once the browser will actually let us make sound. */
+  const ready = () => !!ctx && ctx.state === 'running';
+
+  window.JazzAudio = { play, unlock, ready };
 })();

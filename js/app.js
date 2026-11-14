@@ -134,7 +134,7 @@
           <div class="vis-staff">${R.staffSVG(notes, { highlightRoot: false })}</div>
           <div class="vis-keys">${R.keyboardSVG(notes, { labels: false })}</div>
         </div>
-        <button class="btn ghost small" data-act="play">${playIcon()} Play</button>
+        <button class="btn play-main" data-act="play">${playIcon()} Play chord</button>
         ${invHint()}
       </div>`;
     }
@@ -144,8 +144,8 @@
         <span class="vinyl-label"><b>Changes</b><small>Side A · ${notes.length} notes</small></span>
       </button>
       <div class="play-row">
-        <button class="btn ghost small" data-act="play">${playIcon()} Again</button>
-        <button class="btn ghost small" data-act="arp">${arpIcon()} Arpeggio</button>
+        <button class="btn play-main" data-act="play">${playIcon()} Play again</button>
+        <button class="btn play-alt" data-act="arp">${arpIcon()} Arpeggio</button>
       </div>
       <p class="prompt">What quality is this chord?</p>
       ${invHint()}
@@ -183,8 +183,8 @@
       <div class="back-foot">
         <p class="desc">${chord.desc}</p>
         <div class="play-row">
-          <button class="btn ghost small" data-act="play">${playIcon()} Chord</button>
-          <button class="btn ghost small" data-act="arp">${arpIcon()} Arpeggio</button>
+          <button class="btn play-main" data-act="play">${playIcon()} Play chord</button>
+          <button class="btn play-alt" data-act="arp">${arpIcon()} Arpeggio</button>
         </div>
       </div>
       ${R.scaleList(root, chord)}
@@ -381,7 +381,7 @@
       </div>
       <ol class="prog-row">${steps.map(slotHTML).join('')}</ol>
       <div class="play-row center">
-        <button class="btn ghost small" data-act="playprog">${playIcon()} Play progression <kbd>P</kbd></button>
+        <button class="btn play-main" data-act="playprog">${playIcon()} Play progression <kbd>P</kbd></button>
       </div>
     </div>`;
   }
@@ -534,8 +534,8 @@
         <div class="vis-keys">${R.keyboardSVG(notes)}</div>
         <p class="desc">${chord.desc}</p>
         <div class="play-row">
-          <button class="btn ghost small" data-libplay="chord">${playIcon()} Chord</button>
-          <button class="btn ghost small" data-libplay="arp">${arpIcon()} Arpeggio</button>
+          <button class="btn play-main" data-libplay="chord">${playIcon()} Play chord</button>
+          <button class="btn play-alt" data-libplay="arp">${arpIcon()} Arpeggio</button>
         </div>
         ${R.scaleList(S.libRoot, chord)}
         <p class="detail-stat">${st ? `Practiced ${st.seen}× · ${Math.round((st.right / st.seen) * 100)}% correct · level ${st.box}/${MAX_BOX}` : 'Not practiced yet'}</p>

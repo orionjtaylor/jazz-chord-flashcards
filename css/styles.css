@@ -1314,3 +1314,19 @@ body { transition: opacity 0.18s ease-out; }
 :root[data-theme="light"] .toc-select-wrap { background: var(--ink); }
 /* phones: section jumps stop just below the top bar + sticky "Jump to" bar */
 @media (max-width: 700px) { .learn-main > *, .fam { scroll-margin-top: calc(var(--top-h, 55px) + 72px); } }
+
+/* ───────── Prominent playback: the main play button is a solid, colored button everywhere */
+.btn.play-main, .btn.play-alt { padding: 11px 18px; font-size: 14.5px; border-radius: 12px; gap: 9px; }
+.btn.play-main {
+  background: var(--coral); color: #fff; box-shadow: 0 3px 0 #b23a26, 0 8px 18px -8px rgba(232, 85, 61, 0.6);
+}
+.btn.play-main:hover { background: #f06a52; }
+.btn.play-main:active { box-shadow: 0 1px 0 #b23a26; }
+.btn.play-main .i { width: 15px; height: 15px; }
+.btn.play-main kbd { border-color: rgba(255, 255, 255, 0.6); opacity: 0.8; }
+.btn.play-alt { background: transparent; color: var(--paper-ink); border: 1.5px solid rgba(28, 26, 22, 0.25); }
+.btn.play-alt:hover { border-color: var(--paper-ink); background: rgba(28, 26, 22, 0.05); }
+/* a gentle pulse draws the eye to the play button the first time each card appears */
+@keyframes play-hint { 0%, 100% { box-shadow: 0 3px 0 #b23a26, 0 0 0 0 rgba(232, 85, 61, 0.45); } 50% { box-shadow: 0 3px 0 #b23a26, 0 0 0 8px rgba(232, 85, 61, 0); } }
+.card.enter .front .btn.play-main, .card.enter .front-hear .btn.play-main { animation: play-hint 1.6s ease-out 0.5s 2; }
+@media (prefers-reduced-motion: reduce) { .btn.play-main { animation: none !important; } }

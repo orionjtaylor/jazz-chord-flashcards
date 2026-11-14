@@ -33,10 +33,10 @@
     {
       cat: 'altered', formula: ['1', '3', 'b7', 'b9/#9', '#11', 'b13'], role: 'Extra-tense V chord', feel: 'Crunchy, dark, urgent',
       examples: ['7b9', '7#9', '7alt'],
-      what: 'A dominant 7th with one or more <b>altered tensions</b>: the 9th, 11th or 13th raised or lowered by a half step (♭9, ♯9, ♯11/♭5, ♭13/♯5).',
-      sound: 'More tension than a plain dominant, so the resolution feels stronger. ♭9 is dark and Spanish; ♯9 is gritty and bluesy; ♭13 pulls downward.',
+      what: '<b>Altered</b> is a broad umbrella: any dominant 7th with one or more <b>altered tensions</b> (♭9, ♯9, ♯11/♭5 or ♭13/♯5), meaning any note from the altered (super Locrian) scale. It doesn\'t need all of them, and the 5th can stay natural: C7♭13 is still altered.',
+      sound: 'Crunchy and urgent, with more tension than a plain dominant, so the resolution feels stronger. ♯9 is the classic "alt" sound: gritty and bluesy. ♭9 is dark and Spanish; ♭13 pulls downward.',
       where: 'Mostly on <b>V chords resolving to minor</b> (G7♭9 → Cm), and anywhere a player wants extra pull. In minor ii–V–i progressions it is close to mandatory.',
-      symbols: 'Alterations are written after the number: C7♭9, C7♯9♭13. "<b>C7alt</b>" means "use the altered scale": play any mix of ♭9, ♯9, ♯11 and ♭13, and leave out the natural 5th and 9th.',
+      symbols: 'Alterations are written after the number: C7♭9, C7♯9♭13. "<b>C7alt</b>" is the catch-all: the player picks any altered tensions they like (most often ♯9 and ♭13). The one thing it rules out is a natural 9.',
       tip: 'Rule of thumb: natural tensions (9, 13) for dominants going to major, altered tensions for dominants going to minor.',
     },
     {
@@ -60,10 +60,10 @@
     {
       cat: 'aug', formula: ['1', '3', '#5'], role: 'Passing chords, color', feel: 'Dreamy, unresolved, rising',
       examples: ['aug', 'maj7#5', '7#5'],
-      what: 'A major triad with a <b>raised 5th</b>, which makes two stacked major 3rds. Like °7 it\'s symmetrical: C+, E+ and G♯+ share the same notes.',
+      what: 'A major triad with a <b>raised 5th</b>, which makes two stacked major 3rds. Unlike "altered" (a broad umbrella), "augmented" names one specific change: the ♯5. Like °7 it\'s symmetrical: C+, E+ and G♯+ share the same notes.',
       sound: 'Floating and unresolved, with a sense of rising. The ♯5 wants to keep moving up.',
       where: 'Passing chords that move a line chromatically (C – C+ – C6 – C7), the "Lydian augmented" color maj7♯5, and dominants like 7♯5 heading to the next chord.',
-      symbols: 'aug, + and (♯5) all mean augmented. C+7 = C7♯5; C+Δ7 = Cmaj7♯5.',
+      symbols: 'aug, + and (♯5) all mean augmented. C+7 = C7♯5; C+Δ7 = Cmaj7♯5. An augmented dominant (C7♯5) is also an altered dominant, since ♯5 is the same note as ♭13.',
       tip: 'Hear a whole-tone, dream-sequence sound? That\'s augmented harmony.',
     },
     {
@@ -117,8 +117,8 @@
       <div class="vis-staff">${R.staffSVG(notes, { labels: true })}</div>
       <div class="vis-keys">${R.keyboardSVG(notes)}</div>
       <div class="play-row">
-        <button class="btn ghost small" data-lplay="${id}">${svgPlay} Chord</button>
-        <button class="btn ghost small" data-larp="${id}">${svgArp} Arpeggio</button>
+        <button class="btn play-main" data-lplay="${id}">${svgPlay} Play chord</button>
+        <button class="btn play-alt" data-larp="${id}">${svgArp} Arpeggio</button>
       </div>`;
   }
 
