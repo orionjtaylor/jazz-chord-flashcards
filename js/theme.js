@@ -25,3 +25,17 @@
     });
   });
 })();
+
+/* Hold the first paint until the main fonts are ready (max ~1s), then fade in. Without this the
+   page lays out in a fallback font and visibly resizes when the real fonts arrive. */
+(function () {
+  const root = document.documentElement;
+  if (!document.fonts || !document.fonts.load) return;
+  root.classList.add('fonts-loading');
+  const done = () => root.classList.remove('fonts-loading');
+  const faces = ['900 30px Archivo', '800 30px Fraunces', 'italic 600 30px Fraunces', '400 16px Inter', '16px "Noto Music"'];
+  Promise.race([
+    Promise.all(faces.map((f) => document.fonts.load(f, f.includes('Noto') ? '♭𝄞' : 'Ag'))).catch(() => {}),
+    new Promise((r) => setTimeout(r, 1000)),
+  ]).then(done);
+})();

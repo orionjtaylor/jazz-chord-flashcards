@@ -1185,3 +1185,6 @@ p, dd, .desc, small { text-wrap: pretty; }
   .inv-switch button { flex: 1; padding: 6px 4px; }
   .scales ul { grid-template-columns: 1fr; }
 }
+/* paired with theme.js: invisible until fonts load (never more than ~1s), then a quick fade */
+html.fonts-loading body { opacity: 0; }
+body { transition: opacity 0.18s ease-out; }

@@ -40,6 +40,10 @@ It's plain static files, so any static host works:
 - **GitHub Pages**: push this folder to a repo, then Settings → Pages → deploy from branch.
 - **Netlify / Cloudflare Pages / Vercel**: drag and drop the folder, or connect the repo (no build command; publish directory `.`).
 
+## Fonts
+Archivo, Fraunces, Inter and Noto Music are self-hosted in `fonts/` (SIL Open Font License 1.1; license texts in `fonts/licenses/`).
+They're preloaded and the first paint waits briefly for them (max ~1s), so text never renders in a fallback font and then resizes.
+
 ## Project layout
 ```
 index.html        page structure

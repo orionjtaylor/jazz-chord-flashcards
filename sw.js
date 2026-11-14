@@ -1,11 +1,12 @@
 /* Service worker: makes the app work offline.
    Strategy: serve from cache instantly, refresh the cache in the background
    (stale-while-revalidate), so updates appear on the next launch. */
-const CACHE = 'changes-v16';
+const CACHE = 'changes-v18';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest',
   'css/styles.css', 'js/theory.js', 'js/render.js', 'js/audio.js', 'js/app.js', 'js/pwa.js', 'js/learn.js', 'js/theme.js', 'js/glossary.js',
   'icons/icon.svg', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png',
+  'css/fonts.css', 'fonts/archivo-normal-latin.woff2', 'fonts/archivo-normal-latin-ext.woff2', 'fonts/fraunces-normal-latin.woff2', 'fonts/fraunces-normal-latin-ext.woff2', 'fonts/fraunces-italic-latin.woff2', 'fonts/fraunces-italic-latin-ext.woff2', 'fonts/inter-normal-latin.woff2', 'fonts/inter-normal-latin-ext.woff2', 'fonts/noto-music-normal-latin.woff2', 'fonts/noto-music-normal-latin-ext.woff2', 'fonts/noto-music-normal-music.woff2',
 ];
 
 self.addEventListener('install', (e) => {
