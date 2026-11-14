@@ -1,7 +1,7 @@
 /* Service worker: makes the app work offline.
    Strategy: serve from cache instantly, refresh the cache in the background
    (stale-while-revalidate), so updates appear on the next launch. */
-const CACHE = 'changes-v23';
+const CACHE = 'changes-v25';
 const SHELL = [
   './', 'index.html', 'manifest.webmanifest',
   'css/styles.css', 'js/theory.js', 'js/render.js', 'js/audio.js', 'js/app.js', 'js/pwa.js', 'js/learn.js', 'js/theme.js', 'js/glossary.js',
@@ -27,8 +27,7 @@ self.addEventListener('fetch', (e) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   const sameOrigin = url.origin === self.location.origin;
-  const fonts = url.hostname === 'fonts.googleapis.com' || url.hostname === 'fonts.gstatic.com';
-  if (!sameOrigin && !fonts) return;
+  if (!sameOrigin) return;
 
   e.respondWith(
     caches.open(CACHE).then(async (cache) => {
