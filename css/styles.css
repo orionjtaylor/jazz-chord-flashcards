@@ -1271,3 +1271,12 @@ body { transition: opacity 0.18s ease-out; }
   white-space: normal; overflow: hidden; text-overflow: clip; display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2;
   line-height: 1.35; min-height: 2.7em;
 }
+
+/* Phone top bar: logo left-aligned with the page content; actions (Install, theme, sound) on the right */
+@media (max-width: 700px) {
+  .top { grid-template-columns: auto 1fr; }
+  .brand { grid-column: 1; justify-self: start; }
+  .top-actions { grid-column: 2; justify-self: end; }
+  .install-btn { position: static; height: 34px; padding: 0 11px; }
+}
+@media (max-width: 360px) { .install-btn span { display: none; } .install-btn { padding: 0 9px; } }
