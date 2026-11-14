@@ -71,7 +71,7 @@
 
   const RE = new RegExp(`(?<![\\w♭♯])(?:${TERMS.map(([, src]) => `(${src})`).join('|')})(?![\\w])`, 'gi');
   const TARGETS = '.tag, .back-title h2, .detail-card h2, .ex-title, p, dd, li small, .scales small, .choice-name, .tile-name, .cheat td, .fam-sum, .slot-scale, .inv-name, .equiv, .fam-tip, .ex-title span, .idea p, .mode-hint';
-  const SKIP = '.sym, svg, kbd, .term, .an-symbol, .gl-tip, select, option, script, style, .brand, .dialog-note';
+  const SKIP = '.sym, svg, kbd, .term, .an-symbol, .gl-tip, select, option, script, style, .brand, .dialog-note, .tile, .mchip, .fam-chip';
 
   function annotate(el) {
     const text = el.textContent;

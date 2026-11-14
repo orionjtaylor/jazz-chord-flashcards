@@ -104,12 +104,16 @@
       <div class="lib-head">
         <div>
           <h1 class="lib-title">The chord library</h1>
-          <p class="lib-sub">Every chord type, spelled in any key. Pick a chord to see and hear it. The bar under each one shows your progress.</p>
+          <p class="lib-sub">Every chord type, spelled in any key. Pick a chord to see, hear and study it.</p>
         </div>
-        <div class="root-picker" id="lib-roots" role="radiogroup" aria-label="Root"></div>
+      </div>
+      <div class="lib-toolbar">
+        <div class="lib-tool"><span class="lib-tool-label">Key</span><div class="root-picker" id="lib-roots" role="radiogroup" aria-label="Key"></div></div>
+        <div class="lib-tool"><span class="lib-tool-label">Family</span><div class="lib-fams" id="lib-fams" role="radiogroup" aria-label="Chord family"></div></div>
       </div>
       <div class="lib-layout">
         <div class="lib-cats" id="lib-cats"></div>
+        <div class="lib-backdrop" id="lib-backdrop" hidden></div>
         <aside class="lib-detail" id="lib-detail" aria-live="polite"></aside>
       </div>
     </section>

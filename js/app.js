@@ -102,6 +102,17 @@
     return shuffle([ans, ...ds]);
   }
 
+  /** How to read this chord's inversions, built from its actual chord tones (triads have no 3rd inversion; a 6 chord's is the 6th). */
+  function invKey(chord) {
+    const ORD = ['', '1st', '2nd', '3rd'];
+    const TONE = { 2: '2nd', 3: '3rd', 4: '4th', 5: '5th', 6: '6th', 7: '7th' };
+    const parts = chord.tokens.slice(1).map((t, i) => {
+      const tone = TONE[T.IV[t][0]] || T.pretty(t);
+      return i === 0 ? `<span>Bass on the <b>${tone}</b> = ${ORD[1]} inv.</span>` : `<span><b>${tone}</b> = ${ORD[i + 1]}</span>`;
+    });
+    return `<p class="inv-key" aria-label="How to tell the inversion">${parts.join('')}</p>`;
+  }
+
   function frontHTML() {
     const { root, chord, notes, bass } = card;
     const cat = T.catOf(chord.cat);
@@ -112,6 +123,7 @@
         <p class="prompt">${card.inv
           ? `Spell all ${notes.length} notes, bass note first, and say <b>which inversion</b> it is.`
           : `Spell it. Name all ${notes.length} notes.`}</p>
+        ${card.inv ? invKey(chord) : ''}
         <span class="flip-hint"><span class="kb-only"><kbd>Space</kbd> or tap</span><span class="touch-only">Tap</span> to flip</span>
       </div>`;
     }
@@ -159,7 +171,7 @@
           <span class="tag" style="--c:${cat.color}">${cat.label}</span>
           <h2>${T.title(root, chord)}</h2>
           ${chord.equiv ? `<p class="equiv">≈ ${chord.equiv}</p>` : ''}
-          ${T.canInvert(chord) ? `<p class="inv-name">${T.invName(chord, inv)}</p>` : ''}
+          ${T.canInvert(chord) ? `<p class="inv-name ${inv ? 'is-inv' : ''}">${T.invName(chord, inv)}</p>` : ''}
           ${chord.alts.length ? `<p class="alts">Also written ${chord.alts.map((a) => `<span>${T.prettyRoot(root)}${T.pretty(a)}${bass ? '/' + bass.name : ''}</span>`).join('')}</p>` : ''}
         </div>
       </div>
@@ -448,20 +460,44 @@
   function renderLibrary() {
     $('#lib-roots').innerHTML = T.ROOT_NAMES.map((r) =>
       `<button role="radio" aria-checked="${r === S.libRoot}" class="chip ${r === S.libRoot ? 'on' : ''}" data-libroot="${r}">${T.prettyRoot(r)}</button>`).join('');
-    $('#lib-cats').innerHTML = T.CATEGORIES.map((cat) => {
+    const fam = S.libFam && T.CATEGORIES.some((c) => c.id === S.libFam) ? S.libFam : 'all';
+    $('#lib-fams').innerHTML = [{ id: 'all', label: 'All', short: 'All' }, ...T.CATEGORIES].map((c) =>
+      `<button role="radio" aria-checked="${c.id === fam}" class="fam-chip ${c.id === fam ? 'on' : ''}" data-libfam="${c.id}" ${c.color ? `style="--c:${c.color}"` : ''} title="${c.label}">${c.color ? '<i></i>' : ''}<span class="lbl-long">${c.label}</span><span class="lbl-short">${c.short || c.label}</span></button>`).join('');
+    $('#lib-cats').innerHTML = T.CATEGORIES.filter((cat) => fam === 'all' || cat.id === fam).map((cat) => {
       const list = T.CHORDS.filter((c) => c.cat === cat.id);
       return `<section class="lib-cat" style="--c:${cat.color}">
         <h3><i></i>${cat.label}<small>${list.length}</small></h3>
-        <div class="lib-grid">${list.map((c) => `
-          <button class="tile ${c.id === S.libChord ? 'sel' : ''}" data-chord="${c.id}" aria-pressed="${c.id === S.libChord}">
+        <div class="lib-grid">${list.map((c) => {
+          const st = S.stats[c.id];
+          return `
+          <button class="tile ${c.id === S.libChord ? 'sel' : ''}" data-chord="${c.id}" aria-pressed="${c.id === S.libChord}" title="${c.name}">
             <span class="tile-sym">${R.symHTML(S.libRoot, c)}</span>
             <span class="tile-name">${c.name}</span>
-            <span class="meter" title="Mastery ${box(c.id)}/${MAX_BOX}"><i style="width:${(box(c.id) / MAX_BOX) * 100}%"></i></span>
-          </button>`).join('')}
+            <span class="meter ${st && st.seen ? '' : 'none'}" title="Mastery ${box(c.id)}/${MAX_BOX}"><i style="width:${(box(c.id) / MAX_BOX) * 100}%"></i></span>
+          </button>`;
+        }).join('')}
         </div></section>`;
     }).join('');
     renderDetail();
   }
+
+  // phones/tablets: the chord detail is a bottom sheet that slides up over the list
+  const sheetMQ = window.matchMedia('(max-width: 900px)');
+  function openSheet() {
+    if (!sheetMQ.matches) return;
+    $('#lib-detail').classList.add('open');
+    $('#lib-backdrop').hidden = false;
+    requestAnimationFrame(() => $('#lib-backdrop').classList.add('on'));
+    document.body.classList.add('sheet-open');
+    $('#lib-detail').scrollTop = 0;
+  }
+  function closeSheet() {
+    $('#lib-detail').classList.remove('open');
+    $('#lib-backdrop').classList.remove('on');
+    document.body.classList.remove('sheet-open');
+    setTimeout(() => { if (!$('#lib-detail').classList.contains('open')) $('#lib-backdrop').hidden = true; }, 300);
+  }
+  sheetMQ.addEventListener('change', () => closeSheet());
 
   function libNotes() {
     const chord = libChord();
@@ -483,6 +519,7 @@
     $('#lib-detail').style.setProperty('--c', cat.color);
     $('#lib-detail').innerHTML = `
       <div class="detail-card">
+        <button class="sheet-close" data-sheetclose aria-label="Close">✕</button>
         <span class="tag" style="--c:${cat.color}">${cat.label}</span>
         <div class="detail-sym">${R.symHTML(S.libRoot, chord, bass)}</div>
         <h2>${chord.upper ? T.title(S.libRoot, chord) : chord.name}</h2>
@@ -540,6 +577,7 @@
   }
 
   function setView(v, { push = true } = {}) {
+    if (v !== 'library' && typeof closeSheet === 'function') closeSheet();
     view = v;
     document.body.dataset.view = v;
     stopTimers();
@@ -569,7 +607,9 @@
         S.libRoot = root; S.libChord = id; S.libInv = 0; save();
         setView('library');
         play(libNotes());
-        if (window.matchMedia('(max-width: 900px)').matches) $('#lib-detail').scrollIntoView({ block: 'start' });
+        // a family filter could hide the chord; show all families so it's in the list
+        if (S.libFam && S.libFam !== 'all') { S.libFam = 'all'; save(); renderLibrary(); }
+        if (sheetMQ.matches) openSheet();
         else $(`.tile[data-chord="${CSS.escape(id)}"]`)?.scrollIntoView({ block: 'center' });
       },
     });
@@ -659,9 +699,16 @@
     $$('.tile').forEach((t) => { const on = t === b; t.classList.toggle('sel', on); t.setAttribute('aria-pressed', on); });
     renderDetail();
     play(libNotes());
-    if (window.matchMedia('(max-width: 900px)').matches) $('#lib-detail').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    openSheet();
   });
+  $('#lib-fams').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-libfam]');
+    if (b) { S.libFam = b.dataset.libfam; save(); renderLibrary(); }
+  });
+  $('#lib-backdrop').addEventListener('click', closeSheet);
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('#lib-detail').classList.contains('open')) closeSheet(); });
   $('#lib-detail').addEventListener('click', (e) => {
+    if (e.target.closest('[data-sheetclose]')) return closeSheet();
     const b = e.target.closest('[data-libplay]');
     if (b) return play(libNotes(), b.dataset.libplay === 'arp');
     const iv = e.target.closest('[data-libinv]');
@@ -700,7 +747,7 @@
   renderSound();
   deckCount();
   renderStats();
-  setMode(S.mode);
+  setMode('spell'); // a fresh load always starts on Spell it
   route();
   document.fonts?.ready.then(() => sizeCard());
 })();
