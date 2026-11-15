@@ -1,0 +1,15 @@
+{
+  "name": "changes-ios",
+  "private": true,
+  "description": "Native iOS wrapper for chordchanges.app (Capacitor). Build with ../scripts/build-ios.sh",
+  "dependencies": {
+    "@capacitor/core": "8.6.2",
+    "@capacitor/ios": "8.6.2",
+    "@capacitor/haptics": "8.0.2",
+    "@capacitor/splash-screen": "8.0.2",
+    "@capacitor/status-bar": "8.0.4"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.6.2"
+  }
+}

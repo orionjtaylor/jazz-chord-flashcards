@@ -1,0 +1,18 @@
+{
+  "appId": "app.chordchanges",
+  "appName": "Changes",
+  "webDir": "www",
+  "backgroundColor": "#0e1118",
+  "ios": {
+    "contentInset": "never",
+    "scheme": "Changes",
+    "limitsNavigationsToAppBoundDomains": false
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchAutoHide": false,
+      "backgroundColor": "#0e1118",
+      "showSpinner": false
+    }
+  }
+}

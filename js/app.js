@@ -256,6 +256,7 @@
   function flip() {
     if (S.mode !== 'spell' || card.flipped) return;
     setFlipped(true);
+    Native.tap();
     play(card.notes);
     renderControls();
   }
@@ -314,6 +315,7 @@
     if (ok) { session.right++; session.streak++; S.best = Math.max(S.best, session.streak); }
     else session.streak = 0;
     save();
+    Native.result(ok);
     renderStats(ok);
   }
 
@@ -387,6 +389,7 @@
   }
 
   function revealSlot(i, sound = true) {
+    if (sound && !card.revealed.has(i)) Native.tap();
     card.revealed.add(i);
     const li = $(`.slot[data-slot="${i}"]`);
     if (li) li.outerHTML = slotHTML(card.steps[i], i);

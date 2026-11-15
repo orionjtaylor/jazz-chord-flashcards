@@ -1,5 +1,8 @@
 /* Installable-app support: service worker + "Install" button. */
 (function () {
+  // the App Store app ships its files inside the app, so it needs no service worker or install button
+  if (window.Native && Native.isApp) return;
+
   if ('serviceWorker' in navigator && location.protocol !== 'file:') {
     // When a new version is deployed, the new service worker takes over and we reload once,
     // so updates show on the first open instead of the second.
