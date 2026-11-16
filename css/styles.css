@@ -1338,54 +1338,64 @@ body { transition: opacity 0.18s ease-out; }
 /* ───────── Phones: Practice fits on one screen. The card takes exactly the space left (sized in
    app.js), the page never scrolls, and a tall card back scrolls inside the card. */
 .back-play, .inv-short, .prog-play, .name-play { display: none; }
+/* the record-sleeve circle in the card's corner is decoration: taps go through it to the buttons */
+.face::after { pointer-events: none; }
+/* hide the side facing away. Safari ignores backface-visibility on a face that can scroll, and the
+   mirrored back would show through the front. The switch happens mid-flip, when the card is edge-on. */
+.card .face { transition: background-color 0.25s, border-color 0.25s, color 0.25s, visibility 0s linear 0.14s; }
+.card.no-anim .face { transition: none; }
+.card:not(.flipped) .back, .card.flipped .front { visibility: hidden; }
 .prog-side { flex: none; display: flex; }
 @media (max-width: 700px) {
   body[data-view="practice"] main { padding-bottom: calc(70px + max(8px, env(safe-area-inset-bottom))); }
   #view-practice .stage { margin-top: 12px; }
 
-  .card.fixed-h .card-inner { transition: transform 0.7s cubic-bezier(0.3, 1.25, 0.4, 1); }
+  .face { min-height: 300px; padding: 14px 14px 14px 24px; }
   .card.fixed-h .face {
-    height: var(--h); min-height: 0; overflow-y: auto; overscroll-behavior: contain;
-    padding: 16px 16px 16px 26px; scrollbar-width: none;
+    height: var(--h); min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: none;
   }
   .card.fixed-h .face::-webkit-scrollbar { display: none; }
   .card.fixed-h .face::before { display: none; }
   .card.fixed-h .front { box-shadow: inset 10px 0 0 var(--front-c, var(--gold)), 0 1px 0 rgba(255, 255, 255, 0.6) inset, var(--card-shadow); }
   .card.fixed-h .back { box-shadow: inset 10px 0 0 var(--c), 0 1px 0 rgba(255, 255, 255, 0.6) inset, var(--card-shadow); }
   .card.fixed-h .back.has-more { -webkit-mask-image: linear-gradient(to bottom, #000 calc(100% - 36px), transparent); mask-image: linear-gradient(to bottom, #000 calc(100% - 36px), transparent); }
-  .card.fixed-h .front-spell { min-height: 0; height: 100%; }
-  .card.fixed-h .front-name, .card.fixed-h .front-hear { min-height: 100%; justify-content: safe center; gap: 10px; }
-  .card.fixed-h .front-spell { justify-content: safe center; }
+  .front-spell { min-height: 0; }
+  .card.fixed-h .front-spell { min-height: 100%; }
+  .card .front-name, .card .front-hear { min-height: 100%; justify-content: safe center; gap: 10px; }
+  .card .front-spell { justify-content: safe center; }
   .front-name .inv-hint, .front-hear .inv-hint { display: none; }
   .inv-short { display: inline-block; margin-top: -4px; font-size: 12px; color: var(--paper-muted); }
 
   /* card back: symbol + round play buttons on one line, everything tighter */
-  .back-wrap { gap: 10px; }
-  .back-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 10px; align-items: center; }
-  .back-sym { font-size: 50px; grid-column: 1; grid-row: 1; min-width: 0; }
-  .back-play { display: flex; gap: 8px; grid-column: 2; grid-row: 1; align-self: start; }
-  .back-title { grid-column: 1 / -1; grid-row: 2; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
-  .back-title h2 { font-size: 19px; flex-basis: 100%; }
-  .back-title .tag { order: -1; }
-  .back-title .equiv, .back-title .inv-name, .back-title .alts { font-size: 12.5px; }
-  .round-play {
-    width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; padding: 0; cursor: pointer;
-    background: var(--coral); color: #fff; border: 0; box-shadow: 0 3px 0 #b23a26;
+  .back-wrap { gap: 8px; }
+  .back-head { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 6px 10px; align-items: center; }
+  .back-sym { font-size: 46px; grid-column: 1; grid-row: 1; min-width: 0; }
+  .back-play { display: flex; flex-direction: column; gap: 6px; grid-column: 2; grid-row: 1; }
+  .back-title { grid-column: 1 / -1; grid-row: 2; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 3px 8px; }
+  .back-title h2 { font-size: 17px; }
+  .back-title .tag { order: -1; padding: 4px 8px 4px 7px; font-size: 10px; }
+  .back-title .equiv, .back-title .inv-name, .back-title .alts { font-size: 12px; }
+  .back-foot { gap: 6px; }
+  .back .scales h4 { margin-bottom: 6px; }
+  /* small labelled play buttons: Chord (all notes at once) and Arpeggio (one at a time) */
+  .mini-play {
+    display: inline-flex; align-items: center; gap: 6px; height: 32px; padding: 0 12px 0 10px; border-radius: 999px;
+    font: 700 13px/1 var(--f-ui); cursor: pointer; white-space: nowrap;
+    background: var(--coral); color: #fff; border: 0; box-shadow: 0 2px 0 #b23a26;
   }
-  .round-play:active { transform: translateY(2px); box-shadow: 0 1px 0 #b23a26; }
-  .round-play.alt { background: transparent; color: var(--paper-ink); border: 1.5px solid rgba(28, 26, 22, 0.25); box-shadow: none; }
-  .round-play .i { width: 17px; height: 17px; fill: currentColor; }
-  .round-play:not(.alt) .i { margin-left: 2px; }
+  .mini-play:active { transform: translateY(1px); box-shadow: 0 1px 0 #b23a26; }
+  .mini-play.alt { background: rgba(255, 255, 255, 0.5); color: var(--paper-ink); border: 1.5px solid rgba(28, 26, 22, 0.25); box-shadow: none; }
+  .mini-play .i { width: 13px; height: 13px; fill: currentColor; flex: none; }
   .back-foot .play-row { display: none; }
   .desc { font-size: 13px; }
 
   .back .pills { flex-wrap: nowrap; gap: 6px; }
   .back .pill { flex: 1 1 0; min-width: 0; max-width: 64px; padding: 6px 2px 5px; border-radius: 10px; }
-  .back .pill b { font-size: 18px; }
+  .back .pill b { font-size: 17px; }
   .back .pill span { font-size: 10px; }
   .back .visuals { gap: 8px; }
   .back .vis-staff, .back .vis-keys, .front-name .vis-staff, .front-name .vis-keys { padding: 6px 8px; border-radius: 12px; }
-  .back .vis-staff svg { max-height: 118px; }
+  .back .vis-staff svg { max-height: 104px; }
   .front-name .visuals { gap: 8px; }
   .front-name .vis-staff svg { max-height: 120px; }
   .card.fixed-h .vinyl { width: min(210px, 56vw, calc(var(--h) - 190px)); }
@@ -1404,35 +1414,35 @@ body { transition: opacity 0.18s ease-out; }
   @keyframes next-in { from { opacity: 0; transform: translateY(6px); } }
 
   /* progressions: key beside the title, three compact bars per row */
-  .card.fixed-h .prog { gap: 12px; }
-  .card.fixed-h .prog-head { flex-direction: row; align-items: flex-start; gap: 12px; }
-  .card.fixed-h .prog-name { font-size: 28px; margin: 8px 0 4px; }
-  .card.fixed-h .prog .desc { font-size: 12.5px; line-height: 1.35; }
-  .card.fixed-h .prog-key { flex-direction: column; gap: 0; padding: 6px 12px 5px; border-radius: 12px; box-shadow: 3px 3px 0 var(--gold); margin-top: 2px; }
-  .card.fixed-h .prog-key b { font-size: 28px; }
-  .card.fixed-h .prog-key small { font-size: 8.5px; }
-  .card.fixed-h .prog-side { flex-direction: column; align-items: center; gap: 10px; }
-  .card.fixed-h .prog-play { display: grid; }
-  .card.fixed-h .prog > .play-row { display: none; }
-  .card.fixed-h .prog-row { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
+  .card .prog { gap: 12px; }
+  .card .prog-head { flex-direction: row; align-items: flex-start; gap: 12px; }
+  .card .prog-name { font-size: 28px; margin: 8px 0 4px; }
+  .card .prog .desc { font-size: 12.5px; line-height: 1.35; }
+  .card .prog-key { flex-direction: column; gap: 0; padding: 6px 12px 5px; border-radius: 12px; box-shadow: 3px 3px 0 var(--gold); margin-top: 2px; }
+  .card .prog-key b { font-size: 28px; }
+  .card .prog-key small { font-size: 8.5px; }
+  .card .prog-side { flex-direction: column; align-items: center; gap: 10px; }
+  .card .prog-play { display: inline-flex; }
+  .card .prog > .play-row { display: none; }
+  .card .prog-row { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 7px; }
   /* even rows: 2 → 2 across, 4 → 2×2, 7–8 → 4 across, 9 → 3×3 */
-  .card.fixed-h .prog-row[data-n="2"], .card.fixed-h .prog-row[data-n="4"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-  .card.fixed-h .prog-row[data-n="7"], .card.fixed-h .prog-row[data-n="8"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-  .card.fixed-h .prog-row[data-n="4"] .slot-btn { min-height: 92px; }
-  .card.fixed-h .prog-row[data-n="9"] .slot-btn { min-height: 88px; }
-  .card.fixed-h .prog-row[data-n="7"] .roman, .card.fixed-h .prog-row[data-n="8"] .roman { font-size: 17px; }
-  .card.fixed-h .prog-row[data-n="7"] .slot-sym, .card.fixed-h .prog-row[data-n="8"] .slot-sym { font-size: 19px; }
-  .card.fixed-h .slot-btn { min-height: 104px; padding: 8px 4px; gap: 4px; border-radius: 12px; }
-  .card.fixed-h .roman { font-size: 21px; }
-  .card.fixed-h .slot-q { font-size: 32px; }
-  .card.fixed-h .slot-sym { font-size: 23px; }
-  .card.fixed-h .slot-notes { font-size: 11px; }
-  .card.fixed-h .slot-scale { font-size: 9.5px; }
+  .card .prog-row[data-n="2"], .card .prog-row[data-n="4"] { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .card .prog-row[data-n="7"], .card .prog-row[data-n="8"] { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+  .card .prog-row[data-n="4"] .slot-btn { min-height: 92px; }
+  .card .prog-row[data-n="9"] .slot-btn { min-height: 88px; }
+  .card .prog-row[data-n="7"] .roman, .card .prog-row[data-n="8"] .roman { font-size: 17px; }
+  .card .prog-row[data-n="7"] .slot-sym, .card .prog-row[data-n="8"] .slot-sym { font-size: 19px; }
+  .card .slot-btn { min-height: 104px; padding: 8px 4px; gap: 4px; border-radius: 12px; }
+  .card .roman { font-size: 21px; }
+  .card .slot-q { font-size: 32px; }
+  .card .slot-sym { font-size: 23px; }
+  .card .slot-notes { font-size: 11px; }
+  .card .slot-scale { font-size: 9.5px; }
 
   /* Name it: round play button in the corner instead of a full-width one */
-  .card.fixed-h .name-play { display: grid; position: absolute; top: 14px; right: 14px; z-index: 1; }
-  .card.fixed-h .front-name > .play-main { display: none; }
-  .card.fixed-h .front-name { padding-top: 4px; }
+  .card .name-play { display: inline-flex; position: absolute; top: 12px; right: 12px; z-index: 1; }
+  .card .front-name > .play-main { display: none; }
+  .card .front-name { padding-top: 4px; }
 
   /* progress: one slim row */
   .stats { margin-top: 12px; padding: 10px 0 0; gap: 4px; flex-wrap: nowrap; justify-content: space-between; }
@@ -1444,12 +1454,12 @@ body { transition: opacity 0.18s ease-out; }
 }
 /* short phones (iPhone SE, browser tabs with toolbars): a little smaller so the card still fits */
 @media (max-width: 700px) and (max-height: 700px) {
-  .front-name .vis-staff svg, .back .vis-staff svg { max-height: 84px; }
+  .front-name .vis-staff svg, .back .vis-staff svg { max-height: 76px; }
   .front-name .vis-keys svg, .back .vis-keys svg { max-height: 62px; }
   #controls .choice { min-height: 50px; padding: 6px 8px 5px; }
   #controls .choice-sym { font-size: 26px; }
   #controls .choice-sym.q { font-size: 19px; }
   .back-sym { font-size: 44px; }
-  .card.fixed-h .slot-btn { min-height: 88px; }
-  .card.fixed-h .prog-name { font-size: 24px; }
+  .card .slot-btn { min-height: 88px; }
+  .card .prog-name { font-size: 24px; }
 }

@@ -130,7 +130,7 @@
     if (S.mode === 'name') {
       return `<div class="front-name">
         <span class="tag neutral">What chord is this?</span>${invShort()}
-        <button class="round-play name-play" data-act="play" aria-label="Play chord">${playIcon()}</button>
+        <button class="mini-play name-play" data-act="play" aria-label="Play the chord">${playIcon()}<span>Play</span></button>
         <div class="visuals">
           <div class="vis-staff">${R.staffSVG(notes, { highlightRoot: false })}</div>
           <div class="vis-keys">${R.keyboardSVG(notes, { labels: false })}</div>
@@ -179,8 +179,8 @@
           ${chord.alts.length ? `<p class="alts">Also written ${chord.alts.map((a) => `<span>${T.prettyRoot(root)}${T.pretty(a)}${bass ? '/' + bass.name : ''}</span>`).join('')}</p>` : ''}
         </div>
         <div class="back-play">
-          <button class="round-play" data-act="play" aria-label="Play chord">${playIcon()}</button>
-          <button class="round-play alt" data-act="arp" aria-label="Play arpeggio">${arpIcon()}</button>
+          <button class="mini-play" data-act="play" aria-label="Play the chord">${playIcon()}<span>Chord</span></button>
+          <button class="mini-play alt" data-act="arp" aria-label="Play as an arpeggio">${arpIcon()}<span>Arpeggio</span></button>
         </div>
       </div>
       ${R.notePills(notes)}
@@ -254,8 +254,11 @@
       const top = inner.getBoundingClientRect().top + window.scrollY;
       const below = $('#stats').getBoundingClientRect().bottom - inner.getBoundingClientRect().bottom;
       const pad = parseFloat(getComputedStyle($('main')).paddingBottom) || 0;
-      h = Math.floor(Math.max(200, window.innerHeight - top - below - pad - 1));
+      const room = Math.floor(Math.max(200, window.innerHeight - top - below - pad - 2));
+      el.classList.remove('fixed-h');
+      const natural = (card.kind === 'prog' || !card.flipped ? $('#front') : $('#back')).scrollHeight;
       el.classList.add('fixed-h');
+      h = Math.min(natural, room);
     } else {
       el.classList.remove('fixed-h');
       h = (card.flipped ? $('#back') : $('#front')).scrollHeight;
@@ -404,7 +407,7 @@
         </div>
         <div class="prog-side">
           <div class="prog-key"><small>Key</small><b>${R.symHTML(key, { sym: '' })}</b><small>${prog.mode}</small></div>
-          <button class="round-play prog-play" data-act="playprog" aria-label="Play progression">${playIcon()}</button>
+          <button class="mini-play prog-play" data-act="playprog" aria-label="Play the progression">${playIcon()}<span>Play</span></button>
         </div>
       </div>
       <ol class="prog-row" data-n="${steps.length}">${steps.map(slotHTML).join('')}</ol>
