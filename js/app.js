@@ -129,7 +129,8 @@
     }
     if (S.mode === 'name') {
       return `<div class="front-name">
-        <span class="tag neutral">What chord is this?</span>
+        <span class="tag neutral">What chord is this?</span>${invShort()}
+        <button class="round-play name-play" data-act="play" aria-label="Play chord">${playIcon()}</button>
         <div class="visuals">
           <div class="vis-staff">${R.staffSVG(notes, { highlightRoot: false })}</div>
           <div class="vis-keys">${R.keyboardSVG(notes, { labels: false })}</div>
@@ -139,7 +140,7 @@
       </div>`;
     }
     return `<div class="front-hear">
-      <span class="tag neutral">Ear training</span>
+      <span class="tag neutral">Ear training</span>${invShort()}
       <button class="vinyl" data-act="play" aria-label="Play the chord">
         <span class="vinyl-label"><b>Changes</b><small>Side A · ${notes.length} notes</small></span>
       </button>
@@ -151,6 +152,9 @@
       ${invHint()}
     </div>`;
   }
+
+  /** Phones: the inversion note as a small label (the full sentence is the same on every card). */
+  const invShort = () => S.inv === 'off' ? '' : `<span class="inv-short">${S.inv === 'only' ? 'Every card is inverted' : 'May be inverted'}</span>`;
 
   /** Inversion instructions. In "mixed" decks the text is the same for every card, so it never gives away whether this one is inverted. */
   function invHint() {
@@ -173,6 +177,10 @@
           ${chord.equiv ? `<p class="equiv">≈ ${chord.equiv}</p>` : ''}
           ${T.canInvert(chord) ? `<p class="inv-name ${inv ? 'is-inv' : ''}">${T.invName(chord, inv)}</p>` : ''}
           ${chord.alts.length ? `<p class="alts">Also written ${chord.alts.map((a) => `<span>${T.prettyRoot(root)}${T.pretty(a)}${bass ? '/' + bass.name : ''}</span>`).join('')}</p>` : ''}
+        </div>
+        <div class="back-play">
+          <button class="round-play" data-act="play" aria-label="Play chord">${playIcon()}</button>
+          <button class="round-play alt" data-act="arp" aria-label="Play arpeggio">${arpIcon()}</button>
         </div>
       </div>
       ${R.notePills(notes)}
@@ -203,12 +211,14 @@
       el.style.setProperty('--front-c', 'var(--gold)');
       $('#front').innerHTML = progHTML();
       $('#back').innerHTML = '';
+      $('#front').scrollTop = 0;
     } else {
       const cat = T.catOf(card.chord.cat);
       el.style.setProperty('--c', cat.color);
       el.style.setProperty('--front-c', S.mode === 'spell' ? cat.color : 'var(--gold)');
       $('#front').innerHTML = frontHTML();
       $('#back').innerHTML = backHTML();
+      $('#back').scrollTop = 0;
     }
     $('#front').setAttribute('aria-hidden', card.flipped ? 'true' : 'false');
     $('#back').setAttribute('aria-hidden', card.flipped ? 'false' : 'true');
@@ -236,6 +246,15 @@
       // changes the layout; a tall back scrolls inside the card instead
       // screen height minus nav bar, page padding and the answer row (fixed, so it never wobbles)
       h = Math.round(Math.max(420, Math.min(640, window.innerHeight - (S.mode === 'spell' ? 210 : 248))));
+      el.classList.add('fixed-h');
+    } else if (window.matchMedia('(max-width: 700px)').matches && !$('#view-practice').hidden) {
+      // phones: the card takes exactly the space left between the mode bar and the tab bar, so the
+      // page never scrolls; a tall back scrolls inside the card. Measured from the card's top and from
+      // what sits below it (buttons, stats), which don't depend on the card's current height.
+      const top = inner.getBoundingClientRect().top + window.scrollY;
+      const below = $('#stats').getBoundingClientRect().bottom - inner.getBoundingClientRect().bottom;
+      const pad = parseFloat(getComputedStyle($('main')).paddingBottom) || 0;
+      h = Math.floor(Math.max(200, window.innerHeight - top - below - pad - 1));
       el.classList.add('fixed-h');
     } else {
       el.classList.remove('fixed-h');
@@ -267,6 +286,10 @@
   }
 
   function renderControls() {
+    _renderControls();
+    if (window.matchMedia('(max-width: 700px)').matches) sizeCard();
+  }
+  function _renderControls() {
     const c = $('#controls');
     c.className = 'controls';
     if (card.kind === 'prog') {
@@ -379,9 +402,12 @@
           <h2 class="prog-name">${prog.name}</h2>
           <p class="desc">${prog.desc}</p>
         </div>
-        <div class="prog-key"><small>Key</small><b>${R.symHTML(key, { sym: '' })}</b><small>${prog.mode}</small></div>
+        <div class="prog-side">
+          <div class="prog-key"><small>Key</small><b>${R.symHTML(key, { sym: '' })}</b><small>${prog.mode}</small></div>
+          <button class="round-play prog-play" data-act="playprog" aria-label="Play progression">${playIcon()}</button>
+        </div>
       </div>
-      <ol class="prog-row">${steps.map(slotHTML).join('')}</ol>
+      <ol class="prog-row" data-n="${steps.length}">${steps.map(slotHTML).join('')}</ol>
       <div class="play-row center">
         <button class="btn play-main" data-act="playprog">${playIcon()} Play progression <kbd>P</kbd></button>
       </div>
@@ -419,7 +445,7 @@
       <div><dt>Best</dt><dd>${S.best}</dd></div>
       <div><dt>Accuracy</dt><dd>${acc}</dd></div>
       <div><dt>Cards</dt><dd>${session.seen}</dd></div>
-      <div class="mastery"><dt>Chords mastered</dt><dd>${mastered}<small>/${T.CHORDS.length}</small></dd>
+      <div class="mastery"><dt><span class="lbl-long">Chords </span>mastered</dt><dd>${mastered}<small>/${T.CHORDS.length}</small></dd>
         <span class="mbar"><i style="width:${(mastered / T.CHORDS.length) * 100}%"></i></span></div>`;
   }
 
@@ -433,6 +459,7 @@
       b.setAttribute('aria-checked', on);
     });
     $('#mode-hint').textContent = HINTS[m];
+    $('#view-practice').dataset.mode = m;
     card = null;
     newCard();
   }
@@ -595,7 +622,7 @@
     $('#view-learn').hidden = v !== 'learn';
     if (v === 'library') renderLibrary();
     else if (v === 'learn') mountLearn();
-    else renderStats();
+    else { renderStats(); sizeCard(); }
     syncUrl(push);
     const target = v === 'learn' && location.hash ? document.getElementById('learn-' + location.hash.slice(1)) || document.querySelector(location.hash) : null;
     if (target) requestAnimationFrame(() => target.scrollIntoView({ block: 'start' }));
