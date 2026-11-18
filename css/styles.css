@@ -1474,9 +1474,9 @@ body { transition: opacity 0.18s ease-out; }
 
 @media (max-width: 700px) {
   /* header: smaller title, one control bar (section + key) */
-  .learn-hero { margin: 4px 0 10px; gap: 0; }
-  .learn-hero .lib-title { font-size: 30px; }
-  .learn-hero .lib-sub { margin-top: 6px; font-size: 13.5px; line-height: 1.45; }
+  .learn-hero, .lib-head { margin: 4px 0 10px; gap: 0; }
+  .learn-hero .lib-title, .lib-head .lib-title { font-size: 30px; }
+  .learn-hero .lib-sub, .lib-head .lib-sub { margin-top: 6px; font-size: 13.5px; line-height: 1.45; }
   .learn-hero .hero-more, .learn-hero .learn-root { display: none; }
   .toc-select-wrap { grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 8px 0 10px; }
   .toc-select { padding: 9px 36px 9px 12px; font-size: 14.5px; border-radius: 11px; }
