@@ -802,6 +802,9 @@
   const onScroll = () => {
     scrollQueued = false;
     $('#to-top').classList.toggle('show', view !== 'practice' && window.scrollY > 600);
+    // sticky bars are see-through until they're actually pinned under the top bar
+    const bar = view === 'learn' ? $('#view-learn .toc-select-wrap') : view === 'library' ? $('#view-library .lib-toolbar') : null;
+    if (bar) bar.classList.toggle('stuck', window.scrollY > 0 && bar.getBoundingClientRect().top <= $('.top').offsetHeight + 1);
   };
   window.addEventListener('scroll', () => { if (!scrollQueued) { scrollQueued = true; requestAnimationFrame(onScroll); } }, { passive: true });
   const toTop = () => { Native.tap(); window.scrollTo({ top: 0, behavior: 'smooth' }); };

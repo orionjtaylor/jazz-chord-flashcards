@@ -1680,3 +1680,17 @@ body { transition: opacity 0.18s ease-out; }
   }
   .tile .meter { margin-top: 6px; }
 }
+
+/* picker labels: a fixed line height so a ♭/♯ (from the music font, which has very tall line
+   metrics) can't push the text off-centre */
+.pk-text { line-height: 1.25; }
+.pk-opt { line-height: 1.25; }
+
+/* phones: sticky bars blend into the page until pinned, then get a solid background */
+@media (max-width: 700px) {
+  .toc-select-wrap, .lib-toolbar, :root[data-theme="light"] .toc-select-wrap, :root[data-theme="light"] .lib-toolbar {
+    background: transparent; transition: background-color 0.15s;
+  }
+  .toc-select-wrap.stuck, .lib-toolbar.stuck,
+  :root[data-theme="light"] .toc-select-wrap.stuck, :root[data-theme="light"] .lib-toolbar.stuck { background: var(--ink); }
+}
