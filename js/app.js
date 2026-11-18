@@ -534,6 +534,16 @@
     setTimeout(() => { if (!$('#lib-detail').classList.contains('open')) $('#lib-backdrop').hidden = true; }, 300);
   }
   sheetMQ.addEventListener('change', () => closeSheet());
+  // On phones/tablets the chord details are a bottom sheet, so they live at the top level of the
+  // page and can open over any view (e.g. from Learn) without switching to the Library.
+  // On wider screens they go back to being the Library's side panel.
+  const placeDetail = () => {
+    const layout = $('.lib-layout');
+    if (sheetMQ.matches) document.body.append($('#lib-backdrop'), $('#lib-detail'));
+    else if ($('#lib-detail').parentElement !== layout) layout.append($('#lib-backdrop'), $('#lib-detail'));
+  };
+  placeDetail();
+  sheetMQ.addEventListener('change', placeDetail);
   window.Picker?.swipeToClose($('#lib-detail'), closeSheet, { scroller: () => $('#lib-detail') });
 
   function libNotes() {
@@ -643,6 +653,13 @@
       play: (notes, arp) => play(notes, arp),
       openChord: (root, id) => {
         S.libRoot = root; S.libChord = id; S.libInv = 0; save();
+        if (sheetMQ.matches) {
+          // phones/tablets: open the chord sheet right here; closing it leaves you where you were
+          renderDetail();
+          play(libNotes());
+          openSheet();
+          return;
+        }
         setView('library');
         play(libNotes());
         // a family filter could hide the chord; show all families so it's in the list
