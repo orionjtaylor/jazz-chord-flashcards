@@ -493,6 +493,7 @@
   function renderLibrary() {
     $('#lib-roots').innerHTML = T.ROOT_NAMES.map((r) =>
       `<button role="radio" aria-checked="${r === S.libRoot}" class="chip ${r === S.libRoot ? 'on' : ''}" data-libroot="${r}">${T.prettyRoot(r)}</button>`).join('');
+    $('#lib-root-select').innerHTML = T.ROOT_NAMES.map((r) => `<option value="${r}" ${r === S.libRoot ? 'selected' : ''}>${T.prettyRoot(r)}</option>`).join('');
     const fam = S.libFam && T.CATEGORIES.some((c) => c.id === S.libFam) ? S.libFam : 'all';
     $('#lib-fam-select').innerHTML = [{ id: 'all', label: 'All families' }, ...T.CATEGORIES].map((c) =>
       `<option value="${c.id}" ${c.id === fam ? 'selected' : ''} ${c.color ? `data-c="${c.color}"` : ''}>${c.label}</option>`).join('');
@@ -626,6 +627,7 @@
     if (v === 'library') renderLibrary();
     else if (v === 'learn') mountLearn();
     else { renderStats(); sizeCard(); }
+    requestAnimationFrame(() => onScroll());
     syncUrl(push);
     const target = v === 'learn' && location.hash ? document.getElementById('learn-' + location.hash.slice(1)) || document.querySelector(location.hash) : null;
     if (target) requestAnimationFrame(() => target.scrollIntoView({ block: 'start' }));
@@ -741,6 +743,7 @@
     if (b) { S.libFam = b.dataset.libfam; save(); renderLibrary(); }
   });
   $('#lib-fam-select').addEventListener('change', (e) => { S.libFam = e.target.value; save(); renderLibrary(); });
+  $('#lib-root-select').addEventListener('change', (e) => { S.libRoot = e.target.value; save(); renderLibrary(); syncUrl(false); });
   $('#lib-backdrop').addEventListener('click', closeSheet);
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape' && $('#lib-detail').classList.contains('open')) closeSheet(); });
   $('#lib-detail').addEventListener('click', (e) => {
@@ -788,6 +791,23 @@
   syncTopH();
   window.addEventListener('resize', syncTopH);
   document.fonts?.ready.then(syncTopH);
+
+  // phones: once the page's big title scrolls under the top bar, a small copy takes the logo's place
+  // (tap it to go back to the top); a back-to-top button appears on long pages
+  const PAGE_TITLES = { learn: 'How jazz chords work', library: 'The chord library' };
+  let scrollQueued = false;
+  const onScroll = () => {
+    scrollQueued = false;
+    const big = view !== 'practice' && $(`#view-${view} .lib-title`);
+    const docked = !!big && big.getBoundingClientRect().bottom < $('.top').offsetHeight;
+    if (docked) $('#top-title').textContent = PAGE_TITLES[view] || '';
+    document.body.classList.toggle('title-docked', docked);
+    $('#to-top').classList.toggle('show', view !== 'practice' && window.scrollY > 600);
+  };
+  window.addEventListener('scroll', () => { if (!scrollQueued) { scrollQueued = true; requestAnimationFrame(onScroll); } }, { passive: true });
+  const toTop = () => { Native.tap(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+  $('#to-top').addEventListener('click', toTop);
+  $('#top-title').addEventListener('click', toTop);
 
   setMode('spell'); // a fresh load always starts on Spell it
   route();

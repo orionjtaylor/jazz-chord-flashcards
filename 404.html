@@ -32,6 +32,7 @@
       <span class="brand-mark">Changes</span>
       <span class="brand-sub">Jazz chord flashcards</span>
     </a>
+    <button class="top-title" id="top-title" type="button" tabindex="-1" aria-hidden="true"></button>
     <nav class="tabs" aria-label="Sections">
       <a class="tab active" href="/" data-view="practice"><svg class="tab-ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="4" width="13" height="16" rx="2.5"/><path d="M4 7.5v10A2.5 2.5 0 0 0 6.5 20"/></svg><span>Practice</span></a>
       <a class="tab" href="/learn" data-view="learn"><svg class="tab-ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 6.5C10 5 7 4.5 4 5v13c3-.5 6 0 8 1.5 2-1.5 5-2 8-1.5V5c-3-.5-6 0-8 1.5z"/><path d="M12 6.5v13"/></svg><span>Learn</span></a>
@@ -108,7 +109,7 @@
         </div>
       </div>
       <div class="lib-toolbar">
-        <div class="lib-tool"><span class="lib-tool-label">Key</span><div class="root-picker" id="lib-roots" role="radiogroup" aria-label="Key"></div></div>
+        <div class="lib-tool"><span class="lib-tool-label">Key</span><div class="root-picker" id="lib-roots" role="radiogroup" aria-label="Key"></div><label class="key-select lib-key"><span>Key</span><select id="lib-root-select" aria-label="Key" data-title="Key" data-grid="6"></select></label></div>
         <div class="lib-tool"><span class="lib-tool-label">Family</span><div class="lib-fams" id="lib-fams" role="radiogroup" aria-label="Chord family"></div><select class="fam-select" id="lib-fam-select" aria-label="Chord family" data-title="Chord family"></select></div>
       </div>
       <div class="lib-layout">
@@ -118,6 +119,10 @@
       </div>
     </section>
   </main>
+
+  <button class="to-top" id="to-top" type="button" aria-label="Back to top" tabindex="-1">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6"/></svg>
+  </button>
 
   <footer class="foot">
     <span><kbd>Space</kbd> flip / play</span>

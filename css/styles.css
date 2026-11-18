@@ -1620,3 +1620,50 @@ body { transition: opacity 0.18s ease-out; }
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23a39b8a' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat; background-position: right 9px center; background-size: 10px auto;
 }
+
+/* ───────── Sticky page controls, docked title, back-to-top */
+.top-title, .lib-key { display: none; }
+.to-top {
+  position: fixed; right: max(24px, env(safe-area-inset-right)); bottom: 24px; z-index: 55;
+  width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; padding: 0;
+  background: var(--ink-2); color: var(--text); border: 1px solid var(--line); box-shadow: 0 8px 24px -6px rgba(0, 0, 0, 0.55);
+  opacity: 0; transform: translateY(12px) scale(0.9); pointer-events: none; transition: opacity 0.2s, transform 0.2s;
+}
+.to-top.show { opacity: 1; transform: none; pointer-events: auto; }
+.to-top:active { transform: scale(0.94); }
+.to-top svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
+
+@media (max-width: 700px) {
+  .to-top { right: 16px; bottom: calc(70px + max(8px, env(safe-area-inset-bottom)) + 12px); width: 44px; height: 44px; }
+
+  /* the page title docks into the top bar in place of the logo */
+  .top-title {
+    display: block; grid-column: 1; grid-row: 1; justify-self: start; align-self: center; max-width: 58vw;
+    border: 0; background: none; padding: 0; color: var(--text); cursor: pointer; text-align: left;
+    font-family: var(--f-display); font-stretch: 70%; font-weight: 900; text-transform: uppercase; font-size: 19px; line-height: 1;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    opacity: 0; transform: translateY(8px); pointer-events: none; transition: opacity 0.2s, transform 0.2s;
+  }
+  .brand { grid-row: 1; transition: opacity 0.2s, transform 0.2s; }
+  .top-actions { grid-row: 1; }
+  body.title-docked .brand { opacity: 0; transform: translateY(-8px); pointer-events: none; }
+  body.title-docked .top-title { opacity: 1; transform: none; pointer-events: auto; }
+
+  /* Learn: slimmer sticky bar */
+  .toc-select-wrap { padding: 6px 0 8px; }
+  .toc-select { padding-top: 8px; padding-bottom: 8px; }
+
+  /* Library: same one-row sticky bar as Learn (family + key) instead of the boxed chip grid */
+  .lib-toolbar {
+    position: sticky; top: var(--top-h, 55px); z-index: 5; display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px;
+    margin: 0 0 14px; padding: 6px 0 8px; background: var(--ink); border: 0; border-radius: 0;
+  }
+  .lib-toolbar .lib-tool { display: block; }
+  .lib-toolbar .lib-tool:first-child { order: 2; }
+  .lib-toolbar .lib-tool-label, .lib-toolbar .root-picker { display: none; }
+  .lib-key { display: flex; height: 100%; }
+  .lib-toolbar .fam-select { padding-top: 8px; padding-bottom: 8px; }
+  .lib-cat { scroll-margin-top: calc(var(--top-h, 55px) + 60px); }
+}
+:root[data-theme="light"] .lib-toolbar { background: var(--ink); }
+@media (min-width: 701px) { :root[data-theme="light"] .lib-toolbar { background: var(--ink-2); } }
