@@ -836,7 +836,7 @@
     $('#to-top').classList.toggle('show', view !== 'practice' && window.scrollY > 600);
     // sticky bars are see-through until they're actually pinned under the top bar
     const bar = view === 'learn' ? $('#view-learn .toc-select-wrap') : view === 'library' ? $('#view-library .lib-toolbar') : null;
-    const stuck = !!bar && window.scrollY > 0 && bar.getBoundingClientRect().top <= $('.top').getBoundingClientRect().height + 1;
+    const stuck = !!bar && window.scrollY > 0 && bar.getBoundingClientRect().top <= $('.top').getBoundingClientRect().height + 24; // a little early, so it's solid before it pins
     if (bar) bar.classList.toggle('stuck', stuck);
     document.body.classList.toggle('bar-stuck', stuck);
   };

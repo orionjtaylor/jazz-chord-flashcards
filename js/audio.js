@@ -67,13 +67,31 @@
         el.play().catch(() => {});
       } catch {}
     }
-    ['pointerdown', 'touchend', 'keydown'].forEach((t) => document.removeEventListener(t, unlock, true));
   }
-  ['pointerdown', 'touchend', 'keydown'].forEach((t) => document.addEventListener(t, unlock, true));
+
+  /* iOS can leave the audio context suspended or "interrupted" (a call, Siri, another app's audio,
+     locking the phone), and sometimes resume() never succeeds. Wake it on every tap, and if it
+     still won't run shortly after, throw it away and build a fresh one. */
+  let reviveTimer = 0;
+  function revive() {
+    if (!ctx || ctx.state === 'running') return;
+    ctx.resume().catch(() => {});
+    clearTimeout(reviveTimer);
+    reviveTimer = setTimeout(() => {
+      // (only after a tap: before that, a suspended context is just the browser's autoplay rule)
+      if (!ctx || ctx.state === 'running' || !unlocked) return;
+      try { ctx.close(); } catch {}
+      ctx = null;
+      init();
+      ctx.resume().catch(() => {});
+    }, 500);
+  }
+  const onGesture = () => { if (!unlocked) unlock(); else revive(); };
+  ['pointerdown', 'touchend', 'keydown'].forEach((t) => document.addEventListener(t, onGesture, true));
   // coming back to the app (e.g. after locking the phone) can suspend audio; wake it again
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState === 'visible' && ctx && ctx.state !== 'running') ctx.resume().catch(() => {});
-  });
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') revive(); });
+  window.addEventListener('pageshow', revive);
+  window.addEventListener('focus', revive);
 
   const freq = (m) => 440 * Math.pow(2, (m - 69) / 12);
 
@@ -116,9 +134,19 @@
 
   /** Play MIDI notes as a chord (slight strum) or arpeggio. onNote(midi, index, holdMs) is called
       as each note actually sounds (timed from the audio clock), so the UI can light it up. */
-  function play(midis, { arp = false, onNote = null } = {}) {
+  function play(midis, opts = {}) {
     init();
-    if (ctx.state !== 'running') ctx.resume().catch(() => {});
+    if (ctx.state === 'running') return schedule(midis, opts);
+    // not awake yet: play as soon as it is (or on the fresh context if it had to be rebuilt)
+    revive();
+    const est = opts.arp ? midis.length * 200 + 1200 : 2400;
+    let done = false;
+    const go = () => { if (!done && ctx && ctx.state === 'running') { done = true; schedule(midis, opts); } };
+    ctx.resume().then(go, () => {});
+    [120, 300, 650, 900].forEach((ms) => setTimeout(go, ms));
+    return est;
+  }
+  function schedule(midis, { arp = false, onNote = null } = {}) {
     const sorted = [...midis].sort((a, b) => a - b);
     const t0 = ctx.currentTime + 0.03;
     const vel = 1 / Math.sqrt(sorted.length) * 1.6;
