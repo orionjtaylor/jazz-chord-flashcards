@@ -1716,19 +1716,12 @@ body { transition: opacity 0.18s ease-out; }
   #view-practice .stats { margin-top: auto; margin-left: 0; margin-right: 0; width: 100%; box-sizing: border-box; }
 }
 
-/* ───────── Notes light up as they sound (Render.flash): name pill, staff note, piano key, scale note */
-.pill { transition: transform 0.16s cubic-bezier(0.3, 1.6, 0.5, 1), box-shadow 0.16s; }
-.pill.sounding {
-  transform: translateY(-4px) scale(1.08);
-  box-shadow: 0 0 0 2px var(--paper), 0 0 0 4px #e8553d, 0 8px 16px -6px rgba(232, 85, 61, 0.6);
-}
+/* ───────── Arpeggios: each note lights up on the staff and keyboard as it sounds (Render.flash) */
 .staff .nh > ellipse:first-child { transform-box: fill-box; transform-origin: center; transition: transform 0.16s cubic-bezier(0.3, 1.6, 0.5, 1), fill 0.12s; }
 .staff .nh.sounding > ellipse:first-child { transform: scale(1.35); fill: #e8553d; }
 .staff .nh.sounding { filter: drop-shadow(0 0 3px rgba(232, 85, 61, 0.75)); }
 .keyboard rect[data-midi] { transform-box: fill-box; transform-origin: top center; transition: fill 0.1s, transform 0.12s; }
 .keyboard rect.sounding { fill: #e8553d !important; transform: scaleY(0.975); filter: drop-shadow(0 0 4px rgba(232, 85, 61, 0.8)); }
-.scale-notes i { display: inline-block; transition: transform 0.14s cubic-bezier(0.3, 1.6, 0.5, 1), color 0.1s; }
-.scale-notes i.sounding { color: #e8553d; transform: translateY(-2px) scale(1.18); }
 @media (prefers-reduced-motion: reduce) {
-  .pill.sounding, .staff .nh.sounding > ellipse:first-child, .keyboard rect.sounding, .scale-notes i.sounding { transform: none; }
+  .staff .nh.sounding > ellipse:first-child, .keyboard rect.sounding { transform: none; }
 }

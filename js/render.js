@@ -151,7 +151,7 @@
 
   function notePills(notes) {
     return `<ol class="pills">${notes
-      .map((n) => `<li class="pill${n.token === '1' ? ' root' : ''}${n.upper ? ' up' : ''}" data-midi="${n.midi}"><b>${n.name}</b><span>${n.label}</span></li>`)
+      .map((n) => `<li class="pill${n.token === '1' ? ' root' : ''}${n.upper ? ' up' : ''}"><b>${n.name}</b><span>${n.label}</span></li>`)
       .join('')}</ol>`;
   }
 

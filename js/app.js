@@ -69,14 +69,13 @@
   // where the notes being played are drawn, so they can light up as they sound
   const playScope = () => document.body.classList.contains('sheet-open') ? $('#lib-detail')
     : view === 'practice' ? $('#card') : view === 'library' ? $('#lib-detail') : null;
+  // arpeggios light up each note on the staff and keyboard as it sounds
   const play = (notes, arp, scope = playScope()) =>
-    playMidis(notes.map((n) => n.midi), arp, scope ? (m, i, ms) => R.flash(scope, m, ms) : null);
+    playMidis(notes.map((n) => n.midi), arp, arp && scope ? (m, i, ms) => R.flash(scope, m, ms) : null);
   /** Play a scale; `btn` is its play button, whose row of note names lights up note by note. */
   function playScale(root, id, btn) {
     const ns = T.scaleNotes(root, id);
-    const names = btn ? btn.closest('li')?.querySelectorAll('.scale-notes i') : null;
-    playMidis([...ns.map((n) => n.midi), ns[0].midi + 12], true,
-      names && names.length ? (m, i, ms) => R.flashEl(names[i % names.length], ms) : null);
+    playMidis([...ns.map((n) => n.midi), ns[0].midi + 12], true);
   }
 
   // ───────────────────────── Practice: chord cards
