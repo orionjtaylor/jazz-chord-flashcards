@@ -12,7 +12,9 @@
     stats: {}, progStats: {}, libRoot: 'C', libChord: 'maj7', libInv: 0,
   };
   const S = load();
-  S.libFam = 'all'; // the Library always opens on every family; a filter only lasts for the visit
+  // the Library always opens on every family in C; a filter or key only lasts for the visit
+  // (a link that names a key, e.g. /library?key=Eb, still opens in that key)
+  S.libFam = 'all'; S.libRoot = 'C';
   function load() {
     try { return Object.assign({}, defaults, JSON.parse(localStorage.getItem(STORE) || '{}')); }
     catch { return { ...defaults }; }
