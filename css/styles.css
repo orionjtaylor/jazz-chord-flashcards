@@ -1687,15 +1687,6 @@ body { transition: opacity 0.18s ease-out; }
 .pk-text { line-height: 1.25; }
 .pk-opt { line-height: 1.25; }
 
-/* phones: sticky bars blend into the page until pinned, then get a solid background */
-@media (max-width: 700px) {
-  .toc-select-wrap, .lib-toolbar, :root[data-theme="light"] .toc-select-wrap, :root[data-theme="light"] .lib-toolbar {
-    background: transparent; transition: background-color 0.15s;
-  }
-  .toc-select-wrap.stuck, .lib-toolbar.stuck,
-  :root[data-theme="light"] .toc-select-wrap.stuck, :root[data-theme="light"] .lib-toolbar.stuck { background: var(--ink); }
-}
-
 /* phones: slimmer sticky bars (44px: 34px controls + 4/6px padding) */
 @media (max-width: 700px) {
   .toc-select-wrap, .lib-toolbar { padding: 4px 0 6px; }
@@ -1727,25 +1718,24 @@ body { transition: opacity 0.18s ease-out; }
   .staff .nh.sounding > ellipse:first-child, .keyboard rect.sounding { transform: none; }
 }
 
-/* ───────── Phones: sticky bars span the full screen width and, once pinned, join the top bar into
-   one header (same background, one divider line underneath). They overlap the top bar by 1px so
-   no sliver of the page can show between them. */
+/* ───────── Phones: the Learn/Library dropdown bar scrolls with the page (full width, see-through).
+   Once it slides under the top bar, a copy shows as a second row of the top bar itself (#top-row),
+   so the pinned header is one piece and nothing can flash between two separately pinned layers. */
+.top-row { display: none; }
 @media (max-width: 700px) {
-  .toc-select-wrap, .lib-toolbar {
-    top: calc(var(--top-h, 55px) - 1px);
+  .toc-select-wrap, .lib-toolbar,
+  :root[data-theme="light"] .toc-select-wrap, :root[data-theme="light"] .lib-toolbar {
+    position: relative; top: auto; z-index: auto; background: transparent; transition: none;
     margin-left: calc(-1 * clamp(16px, 4vw, 48px)); margin-right: calc(-1 * clamp(16px, 4vw, 48px));
     padding-left: clamp(16px, 4vw, 48px); padding-right: clamp(16px, 4vw, 48px);
-    border-bottom: 1px solid transparent; transition: none; /* instant: a fade would let cards show through */
   }
-  .toc-select-wrap.stuck, .lib-toolbar.stuck,
-  :root[data-theme="light"] .toc-select-wrap.stuck, :root[data-theme="light"] .lib-toolbar.stuck { background: var(--ink); border-bottom-color: var(--line); }
-
+  .top-row {
+    display: block; position: absolute; left: 0; right: 0; top: 100%;
+    background: var(--ink); border-bottom: 1px solid var(--line); visibility: hidden;
+  }
+  body.bar-stuck .top-row { visibility: visible; }
   body.bar-stuck .top { border-bottom-color: transparent; }
-  /* during fast (momentum) scrolling the pinned bar and the top bar can drift a pixel or two apart;
-     a solid strip reaching up under the top bar keeps the page from flashing through */
-  .toc-select-wrap.stuck::before, .lib-toolbar.stuck::before {
-    content: ''; position: absolute; left: 0; right: 0; bottom: 100%; height: 14px; background: var(--ink); pointer-events: none;
-  }
+  .top-row > .toc-select-wrap, .top-row > .lib-toolbar { margin: 0; }
 }
 
 /* ───────── Chord opened from Learn (phones/tablets): a centred pop-up over a dimmed, blurred page,

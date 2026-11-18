@@ -12,6 +12,7 @@
     stats: {}, progStats: {}, libRoot: 'C', libChord: 'maj7', libInv: 0,
   };
   const S = load();
+  S.libFam = 'all'; // the Library always opens on every family; a filter only lasts for the visit
   function load() {
     try { return Object.assign({}, defaults, JSON.parse(localStorage.getItem(STORE) || '{}')); }
     catch { return { ...defaults }; }
@@ -830,15 +831,39 @@
   if ('ResizeObserver' in window) new ResizeObserver(syncTopH).observe($('.top'), { box: 'border-box' });
 
   // a back-to-top button appears on long pages
+  /* Phones: a copy of the Learn/Library dropdown bar, shown as a second row inside the top bar.
+     Its buttons open the real dropdowns (found at tap time, since Learn re-renders its bar). */
+  const phoneMQ = window.matchMedia('(max-width: 700px)');
+  const topRow = $('#top-row');
+  const realBar = (v) => v === 'learn' ? $('#view-learn .toc-select-wrap') : $('#view-library .lib-toolbar');
+  function fillTopRow(bar, v) {
+    const sig = v + '|' + [...bar.querySelectorAll('.pk-btn')].map((b) => b.innerHTML).join('|');
+    if (topRow._sig === sig && topRow._bar === bar) return;
+    topRow._sig = sig; topRow._bar = bar;
+    const copy = bar.cloneNode(true);
+    copy.querySelectorAll('select').forEach((s) => s.remove());
+    copy.querySelectorAll('[id]').forEach((n) => n.removeAttribute('id'));
+    copy.querySelectorAll('.pk-btn').forEach((b, i) => {
+      b.setAttribute('aria-expanded', 'false');
+      b.addEventListener('click', () => realBar(v)?.querySelectorAll('.pk-btn')[i]?.click());
+    });
+    topRow.replaceChildren(copy);
+  }
+  // a choice changes the labels: refresh the copy
+  let rowQueued = false;
+  const refreshRow = () => { if (!rowQueued) { rowQueued = true; requestAnimationFrame(() => { rowQueued = false; onScroll(); }); } };
+  document.addEventListener('change', refreshRow);
+  document.addEventListener('pk-sync', refreshRow);
+
   let scrollQueued = false;
   const onScroll = () => {
     scrollQueued = false;
     $('#to-top').classList.toggle('show', view !== 'practice' && window.scrollY > 600);
-    // sticky bars are see-through until they're actually pinned under the top bar
     const bar = view === 'learn' ? $('#view-learn .toc-select-wrap') : view === 'library' ? $('#view-library .lib-toolbar') : null;
-    const stuck = !!bar && window.scrollY > 0 && bar.getBoundingClientRect().top <= $('.top').getBoundingClientRect().height + 24; // a little early, so it's solid before it pins
-    if (bar) bar.classList.toggle('stuck', stuck);
-    document.body.classList.toggle('bar-stuck', stuck);
+    // phones: once the dropdown bar slides under the top bar, its copy shows inside the top bar
+    const pinned = !!bar && phoneMQ.matches && window.scrollY > 0 && bar.getBoundingClientRect().top < $('.top').getBoundingClientRect().bottom - 0.5;
+    if (pinned) fillTopRow(bar, view);
+    document.body.classList.toggle('bar-stuck', pinned);
   };
   window.addEventListener('scroll', () => { if (!scrollQueued) { scrollQueued = true; requestAnimationFrame(onScroll); } }, { passive: true });
   const toTop = () => { Native.tap(); window.scrollTo({ top: 0, behavior: 'smooth' }); };

@@ -18,6 +18,7 @@
     const opt = sel.options[sel.selectedIndex];
     btn.querySelector('.pk-val').innerHTML = labelHTML(opt);
     btn.setAttribute('aria-label', `${titleOf(sel)}: ${opt ? opt.textContent : ''}`);
+    document.dispatchEvent(new Event('pk-sync')); // copies of this button (the phone header row) follow
   }
 
   function enhance(sel) {

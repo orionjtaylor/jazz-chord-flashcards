@@ -11,7 +11,25 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Play sound like a music app: ignore the silent switch, mix politely with other audio.
         try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])
         try? AVAudioSession.sharedInstance().setActive(true)
+        // after iOS interrupts audio (a call, Siri, another app) or resets it, the page's audio engine
+        // can go silent while still reporting it's running; tell the page to start a fresh one
+        let nc = NotificationCenter.default
+        nc.addObserver(forName: AVAudioSession.interruptionNotification, object: nil, queue: .main) { [weak self] note in
+            guard let raw = note.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt,
+                  AVAudioSession.InterruptionType(rawValue: raw) == .ended else { return }
+            self?.restartWebAudio()
+        }
+        nc.addObserver(forName: AVAudioSession.mediaServicesWereResetNotification, object: nil, queue: .main) { [weak self] _ in
+            try? AVAudioSession.sharedInstance().setCategory(.playback, mode: .default, options: [.mixWithOthers])
+            self?.restartWebAudio()
+        }
         return true
+    }
+
+    func restartWebAudio() {
+        try? AVAudioSession.sharedInstance().setActive(true)
+        let web = (window?.rootViewController as? CAPBridgeViewController)?.bridge?.webView
+        web?.evaluateJavaScript("window.JazzAudio && window.JazzAudio.reset && window.JazzAudio.reset()", completionHandler: nil)
     }
 
     func applicationWillResignActive(_ application: UIApplication) {
@@ -29,8 +47,8 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
-        // calls, Siri or other apps can deactivate the audio session; take it back
-        try? AVAudioSession.sharedInstance().setActive(true)
+        // calls, Siri or other apps can deactivate the audio session; take it back with a fresh engine
+        restartWebAudio()
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     }
 

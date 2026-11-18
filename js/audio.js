@@ -80,11 +80,25 @@
     reviveTimer = setTimeout(() => {
       // (only after a tap: before that, a suspended context is just the browser's autoplay rule)
       if (!ctx || ctx.state === 'running' || !unlocked) return;
-      try { ctx.close(); } catch {}
-      ctx = null;
-      init();
-      ctx.resume().catch(() => {});
+      rebuild();
     }, 500);
+  }
+  /** Throw the audio context away and start a fresh one. */
+  function rebuild() {
+    if (!ctx) return;
+    try { ctx.close(); } catch {}
+    ctx = null; lastWall = 0;
+    init();
+    ctx.resume().catch(() => {});
+  }
+  /* iOS can also leave a context that says "running" but whose clock has frozen (it plays nothing).
+     Between two plays, the audio clock should advance along with real time; if it hasn't, it's stuck. */
+  let lastWall = 0, lastAudio = 0;
+  function clockStuck() {
+    const now = performance.now(), at = ctx.currentTime;
+    const stuck = lastWall > 0 && now - lastWall > 400 && at - lastAudio < 0.05;
+    lastWall = now; lastAudio = at;
+    return stuck;
   }
   const onGesture = () => { if (!unlocked) unlock(); else revive(); };
   ['pointerdown', 'touchend', 'keydown'].forEach((t) => document.addEventListener(t, onGesture, true));
@@ -136,9 +150,10 @@
       as each note actually sounds (timed from the audio clock), so the UI can light it up. */
   function play(midis, opts = {}) {
     init();
-    if (ctx.state === 'running') return schedule(midis, opts);
+    const stuck = ctx.state === 'running' && clockStuck();
+    if (ctx.state === 'running' && !stuck) return schedule(midis, opts);
     // not awake yet: play as soon as it is (or on the fresh context if it had to be rebuilt)
-    revive();
+    if (stuck) rebuild(); else revive();
     const est = opts.arp ? midis.length * 200 + 1200 : 2400;
     let done = false;
     const go = () => { if (!done && ctx && ctx.state === 'running') { done = true; schedule(midis, opts); } };
@@ -166,5 +181,8 @@
   /** True once the browser will actually let us make sound. */
   const ready = () => !!ctx && ctx.state === 'running';
 
-  window.JazzAudio = { play, unlock, ready };
+  /** Called by the iPhone app after iOS interrupts audio (a call, Siri, another app, a reset). */
+  const reset = () => { if (ctx) rebuild(); };
+
+  window.JazzAudio = { play, unlock, ready, reset };
 })();
