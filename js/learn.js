@@ -95,6 +95,8 @@
     ['Chord–scale', 'Every chord implies a scale to improvise with: Dorian on m7, Mixolydian on 7, Lydian on maj7♯11, altered on 7alt. Each chord in the library lists its scales.'],
   ];
 
+  const TOPICS = [['what', 'What makes it', 'What'], ['sound', 'How it sounds', 'Sound'], ['where', "Where you'll see it", 'Where'], ['symbols', 'Reading the symbol', 'Symbol']];
+
   const svgPlay = '<svg viewBox="0 0 24 24" aria-hidden="true" class="i"><path d="M7 5l12 7-12 7z"/></svg>';
   const svgArp = '<svg viewBox="0 0 24 24" aria-hidden="true" class="i"><rect x="3" y="15" width="4" height="5" rx="1"/><rect x="10" y="10" width="4" height="10" rx="1"/><rect x="17" y="5" width="4" height="15" rx="1"/></svg>';
   const chordById = (id) => T.CHORDS.find((c) => c.id === id);
@@ -135,12 +137,11 @@
         <div class="fam-formula" aria-label="Formula">${fam.formula.map((t) => `<span>${fml(t)}</span>`).join('')}</div>
       </header>
       <div class="fam-body">
-        <dl class="fam-text">
-          <dt>What makes it</dt><dd>${fam.what}</dd>
-          <dt>How it sounds</dt><dd>${fam.sound}</dd>
-          <dt>Where you'll see it</dt><dd>${fam.where}</dd>
-          <dt>Reading the symbol</dt><dd>${fam.symbols}</dd>
-        </dl>
+        <div class="fam-text">
+          <div class="fam-tabs" role="tablist" aria-label="${cat.label}: topics">${TOPICS.map(([k, , short], j) =>
+            `<button role="tab" aria-selected="${j === 0}" class="${j === 0 ? 'on' : ''}" data-ftab="${k}">${short}</button>`).join('')}</div>
+          ${TOPICS.map(([k, long], j) => `<section class="fam-panel${j === 0 ? ' on' : ''}" data-k="${k}"><h4>${long}</h4><p>${fam[k]}</p></section>`).join('')}
+        </div>
         <div class="fam-ex" data-fam="${fam.cat}">${exampleHTML(fam)}</div>
       </div>
       <div class="fam-tip"><b>Tip</b><p>${fam.tip}</p></div>
@@ -180,22 +181,25 @@
       <div class="learn-hero">
         <div>
           <h1 class="lib-title">How jazz chords work</h1>
-          <p class="lib-sub">A short guide to every chord family in the app: what it is, how it sounds and where it shows up. Tap any example to hear it.</p>
+          <p class="lib-sub">A short guide to every chord family in the app: what it is, how it sounds and where it shows up. <span class="hero-more">Tap any example to hear it.</span></p>
         </div>
         <label class="learn-root">Examples in
-          <select id="learn-root">${T.ROOT_NAMES.map((r) => `<option value="${r}" ${r === root ? 'selected' : ''}>${T.prettyRoot(r)}</option>`).join('')}</select>
+          <select id="learn-root" class="learn-root-select">${T.ROOT_NAMES.map((r) => `<option value="${r}" ${r === root ? 'selected' : ''}>${T.prettyRoot(r)}</option>`).join('')}</select>
         </label>
       </div>
 
       <div class="learn-layout">
-        <label class="toc-select-wrap"><span>Jump to</span>
+        <div class="toc-select-wrap">
           <select class="toc-select" aria-label="Jump to section">
             <option value="learn-basics">The basics</option>
             ${FAMILIES.map((f) => `<option value="learn-${f.cat}">${T.catOf(f.cat).label}</option>`).join('')}
             <option value="learn-ideas">Key ideas</option>
             <option value="learn-table">Cheat sheet</option>
           </select>
-        </label>
+          <label class="key-select"><span>Key</span>
+            <select class="learn-root-select" aria-label="Key for the examples">${T.ROOT_NAMES.map((r) => `<option value="${r}" ${r === root ? 'selected' : ''}>${T.prettyRoot(r)}</option>`).join('')}</select>
+          </label>
+        </div>
         <nav class="learn-toc" aria-label="Guide contents">
           <a href="#learn-basics">The basics</a>
           ${FAMILIES.map((f) => `<a href="#learn-${f.cat}" style="--c:${T.catOf(f.cat).color}"><i></i>${T.catOf(f.cat).label}</a>`).join('')}
@@ -251,6 +255,13 @@
         el.querySelector(`.fam-ex[data-fam="${cat}"]`).innerHTML = exampleHTML(fam);
         return api.play(T.voice(root, chordById(id)));
       }
+      const ft = e.target.closest('[data-ftab]');
+      if (ft) {
+        const box = ft.closest('.fam-text');
+        box.querySelectorAll('[data-ftab]').forEach((b) => { const on = b === ft; b.classList.toggle('on', on); b.setAttribute('aria-selected', on); });
+        box.querySelectorAll('.fam-panel').forEach((pn) => pn.classList.toggle('on', pn.dataset.k === ft.dataset.ftab));
+        return;
+      }
       const p = e.target.closest('[data-lplay],[data-larp]');
       if (p) return api.play(T.voice(root, chordById(p.dataset.lplay || p.dataset.larp)), !!p.dataset.larp);
       const o = e.target.closest('[data-open]');
@@ -296,7 +307,7 @@
     }, { passive: true });
     watch();
     el.addEventListener('change', (e) => {
-      if (e.target.id !== 'learn-root') return;
+      if (!e.target.classList.contains('learn-root-select')) return;
       root = e.target.value;
       const y = window.scrollY;
       render(el);

@@ -1463,3 +1463,93 @@ body { transition: opacity 0.18s ease-out; }
   .card .slot-btn { min-height: 88px; }
   .card .prog-name { font-size: 24px; }
 }
+
+/* ───────── Learn: family text as four topics. Larger screens show them all (as before);
+   phones show one at a time behind a small tab row. */
+.fam-tabs { display: none; }
+.fam-panel h4 { margin: 14px 0 0; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; font-weight: 700; color: var(--paper-muted); }
+.fam-panel:first-of-type h4 { margin-top: 0; }
+.fam-panel p { margin: 4px 0 0; font-size: 14.5px; line-height: 1.6; color: #2f2b23; }
+.fam-panel b { color: var(--paper-ink); }
+
+@media (max-width: 700px) {
+  /* header: smaller title, one control bar (section + key) */
+  .learn-hero { margin: 4px 0 10px; gap: 0; }
+  .learn-hero .lib-title { font-size: 30px; }
+  .learn-hero .lib-sub { margin-top: 6px; font-size: 13.5px; line-height: 1.45; }
+  .learn-hero .hero-more, .learn-hero .learn-root { display: none; }
+  .toc-select-wrap { grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 8px 0 10px; }
+  .toc-select { padding: 9px 36px 9px 12px; font-size: 14.5px; border-radius: 11px; }
+  .key-select { display: flex; align-items: center; gap: 0; background: var(--ink-2); border: 1px solid var(--line); border-radius: 11px; padding-left: 11px; }
+  .key-select span { font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+  .key-select select {
+    -webkit-appearance: none; appearance: none; border: 0; background: transparent; color: var(--text); padding: 7px 12px 7px 8px;
+    font: 700 17px var(--f-sym), var(--f-music); min-width: 44px; text-align: center;
+  }
+  .learn-main { gap: 14px; }
+  .learn-main > *, .fam { scroll-margin-top: calc(var(--top-h, 55px) + 60px); }
+
+  /* basics */
+  .basics { gap: 14px; }
+  .basic-card { padding: 18px 16px; }
+  .basic-card h2, .sec-title { font-size: 22px; }
+  .basic-card p { font-size: 14px; line-height: 1.5; margin-bottom: 12px; }
+  .stack-vis { gap: 8px; }
+  .stack-vis .vis-staff svg { max-height: 130px; }
+  .an-symbol { font-size: 64px; }
+  .anatomy { gap: 12px; }
+  .an-legend { grid-template-columns: 1fr; gap: 6px; }
+  .an-legend li { padding: 7px 10px 7px 7px; gap: 10px; align-items: center; }
+  .an-legend b { font-size: 10px; }
+  .an-legend small { font-size: 12.5px; line-height: 1.35; margin-top: 1px; }
+  .learn-layout { gap: 0; }
+
+  /* family cards */
+  .fam { padding: 16px 14px 16px 24px; }
+  .fam::before { width: 8px; }
+  .fam-head { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 12px; align-items: center; margin-bottom: 12px; }
+  .fam-num { font-size: 40px; grid-row: 1 / span 2; }
+  .fam-head h2 { font-size: 26px; }
+  .fam-sum { font-size: 13px; margin: 2px 0 0; }
+  .fam-formula { grid-column: 1 / -1; margin: 8px 0 0; gap: 5px; }
+  .fam-formula span { font-size: 12.5px; padding: 2px 8px; border-width: 1.5px; border-radius: 7px; }
+  .fam-body { gap: 12px; }
+
+  .fam-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 2px; padding: 3px; margin-bottom: 10px; border-radius: 11px; background: rgba(28, 26, 22, 0.07); }
+  .fam-tabs button {
+    border: 0; background: transparent; color: var(--paper-muted); font: 700 12.5px/1 var(--f-ui); padding: 9px 2px; border-radius: 8px; cursor: pointer;
+  }
+  .fam-tabs button.on { background: var(--paper); color: var(--paper-ink); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14); }
+  .fam-panel { display: none; }
+  .fam-panel.on { display: block; animation: panel-in 0.2s ease-out; }
+  .fam-panel h4 { display: none; }
+  .fam-panel p { margin: 0; font-size: 14px; line-height: 1.55; }
+  @keyframes panel-in { from { opacity: 0; transform: translateY(3px); } }
+
+  .fam-ex { padding: 10px; gap: 8px; border-radius: 14px; }
+  .ex-tabs { gap: 5px; }
+  .ex-tabs button { font-size: 19px; padding: 1px 10px; border-radius: 9px; }
+  .ex-title { font-size: 14.5px; }
+  .fam-ex .pills { gap: 5px; }
+  .fam-ex .pills .pill { min-width: 40px; padding: 5px 6px 4px; border-radius: 9px; }
+  .fam-ex .pill b { font-size: 16px; }
+  .fam-ex .vis-staff, .fam-ex .vis-keys { padding: 6px 8px; border-radius: 11px; }
+  .fam-ex .vis-staff svg { max-height: 110px; }
+  .fam-ex .play-row { gap: 8px; }
+  .fam-ex .play-row .btn { flex: 1 1 0; justify-content: center; padding: 9px 10px; font-size: 14px; }
+
+  .fam-tip { margin-top: 12px; padding: 10px 12px; font-size: 13.5px; gap: 10px; }
+  .fam-members { margin-top: 12px; padding-top: 12px; gap: 5px; }
+  .fam-members > span { flex-basis: 100%; margin: 0 0 2px; }
+  .fam-members .mchip { font-size: 18px; padding: 0 8px; border-radius: 8px; }
+
+  /* key ideas + cheat sheet */
+  .sec-title { margin: 6px 0 10px; }
+  .idea-grid { gap: 8px; }
+  .idea { padding: 12px 14px; border-radius: 14px; }
+  .idea h3 { font-size: 15px; margin-bottom: 3px; }
+  .idea p { font-size: 13.5px; line-height: 1.45; }
+  .cheat tbody { gap: 8px; }
+  .cheat tr { padding: 12px 14px; gap: 6px 12px; border-radius: 14px; }
+  .cheat td { font-size: 13.5px; }
+}
