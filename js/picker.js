@@ -78,6 +78,7 @@
     requestAnimationFrame(() => layer.classList.add('in'));
     (on || list.querySelector('.pk-opt'))?.focus({ preventScroll: true });
 
+    if (sheet) swipeToClose(panel, () => close(), { scroller: () => list });
     layer.addEventListener('click', (e) => {
       const o = e.target.closest('.pk-opt');
       if (o) return choose(+o.dataset.i);
@@ -94,6 +95,44 @@
       else if (e.key === 'End') { e.preventDefault(); opts[opts.length - 1].focus(); }
       else if (e.key === 'Tab') { e.preventDefault(); close(); }
     });
+  }
+
+  /** Swipe a bottom sheet down to close it. The drag only starts when the sheet's content is
+      scrolled to the top (or it starts on the handle), so scrolling inside the sheet still works. */
+  function swipeToClose(panel, onClose, { scroller } = {}) {
+    let y0 = null, dy = 0, t0 = 0, dragging = false, allowed = false;
+    panel.addEventListener('touchstart', (e) => {
+      if (e.touches.length !== 1) { y0 = null; return; }
+      const sc = scroller ? scroller() : null;
+      y0 = e.touches[0].clientY; t0 = Date.now(); dy = 0; dragging = false;
+      allowed = !sc || sc.scrollTop <= 0 || !!e.target.closest('.pk-grab, .pk-title');
+    }, { passive: true });
+    panel.addEventListener('touchmove', (e) => {
+      if (y0 == null || !allowed) return;
+      const d = e.touches[0].clientY - y0;
+      if (!dragging) {
+        if (d < -4) { y0 = null; return; } // swiping up: let the content scroll
+        if (d < 8) return;
+        dragging = true;
+        panel.style.transition = 'none';
+      }
+      dy = Math.max(0, d - 8);
+      panel.style.transform = `translateY(${dy}px)`;
+      if (e.cancelable) e.preventDefault();
+    }, { passive: false });
+    const end = () => {
+      if (y0 == null) return;
+      y0 = null;
+      if (!dragging) return;
+      dragging = false;
+      const fast = dy / Math.max(1, Date.now() - t0) > 0.5;
+      // hand the position back to the stylesheet: it animates from here to open (snap back) or closed
+      panel.style.transition = '';
+      panel.style.transform = '';
+      if (dy > Math.min(110, panel.offsetHeight * 0.3) || (fast && dy > 30)) onClose();
+    };
+    panel.addEventListener('touchend', end);
+    panel.addEventListener('touchcancel', end);
   }
 
   function choose(i) {
@@ -130,5 +169,5 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', () => scan(document));
   else scan(document);
 
-  window.Picker = { sync, close };
+  window.Picker = { sync, close, swipeToClose };
 })();

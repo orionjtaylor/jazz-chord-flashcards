@@ -534,6 +534,7 @@
     setTimeout(() => { if (!$('#lib-detail').classList.contains('open')) $('#lib-backdrop').hidden = true; }, 300);
   }
   sheetMQ.addEventListener('change', () => closeSheet());
+  window.Picker?.swipeToClose($('#lib-detail'), closeSheet, { scroller: () => $('#lib-detail') });
 
   function libNotes() {
     const chord = libChord();
