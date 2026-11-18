@@ -1704,3 +1704,14 @@ body { transition: opacity 0.18s ease-out; }
   .key-select > span { font-size: 10px; }
   .learn-main > *, .fam, .lib-cat { scroll-margin-top: calc(var(--top-h, 55px) + 52px); }
 }
+
+/* phones: Practice fills the screen and the progress row sits at the bottom, just above the tab
+   bar, so it stays put when the card grows on flip */
+@media (max-width: 700px) {
+  #view-practice:not([hidden]) {
+    display: flex; flex-direction: column;
+    min-height: calc(100dvh - var(--top-h, 55px) - 14px - 70px - max(8px, env(safe-area-inset-bottom)));
+  }
+  #view-practice #controls { margin-left: 0; margin-right: 0; margin-bottom: 12px; width: 100%; }
+  #view-practice .stats { margin-top: auto; margin-left: 0; margin-right: 0; width: 100%; box-sizing: border-box; }
+}

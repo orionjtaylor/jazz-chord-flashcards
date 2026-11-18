@@ -252,7 +252,11 @@
       // page never scrolls; a tall back scrolls inside the card. Measured from the card's top and from
       // what sits below it (buttons, stats), which don't depend on the card's current height.
       const top = inner.getBoundingClientRect().top + window.scrollY;
-      const below = $('#stats').getBoundingClientRect().bottom - inner.getBoundingClientRect().bottom;
+      // what has to fit under the card: the answer buttons and the stats row (which is pinned to the
+      // bottom, so measure the pieces rather than the distance, which includes any spare space)
+      const ctl = $('#controls'), stats = $('#stats');
+      const below = ctl.offsetHeight + parseFloat(getComputedStyle(ctl).marginTop) + parseFloat(getComputedStyle(ctl).marginBottom)
+        + stats.offsetHeight;
       const pad = parseFloat(getComputedStyle($('main')).paddingBottom) || 0;
       const room = Math.floor(Math.max(200, window.innerHeight - top - below - pad - 2));
       el.classList.remove('fixed-h');
