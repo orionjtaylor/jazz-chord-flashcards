@@ -99,7 +99,7 @@
       const x = cx + (n._off ? 17 : 0);
       const y = yOf(n.d);
       const cls = 'nh' + (highlightRoot && n.token === '1' ? ' root' : '') + (highlightRoot && n.upper ? ' up' : '');
-      s += `<g class="${cls}" transform="translate(${x},${y})"><ellipse rx="8.6" ry="6.2"/><ellipse class="nh-hole" rx="4.4" ry="2.9" transform="rotate(-48)"/></g>`;
+      s += `<g class="${cls}" data-midi="${n.midi}" transform="translate(${x},${y})"><ellipse rx="8.6" ry="6.2"/><ellipse class="nh-hole" rx="4.4" ry="2.9" transform="rotate(-48)"/></g>`;
       if (labels) s += `<text class="st-label" x="${cx + (anyOff ? 40 : 24) + (n._off ? 20 : 0)}" y="${y + 4}">${n.label}</text>`;
     }
     // crop the viewBox to the content so the staff fills its panel
@@ -126,7 +126,7 @@
     whites.forEach((m, i) => {
       const n = hits.get(m);
       const cls = n ? 'wk hit' + (n.token === '1' ? ' root' : '') + (n.upper && labels ? ' up' : '') : 'wk';
-      s += `<rect class="${cls}" x="${i * WK}" y="0" width="${WK}" height="${WH}" rx="3"/>`;
+      s += `<rect class="${cls}" ${n ? `data-midi="${m}"` : ''} x="${i * WK}" y="0" width="${WK}" height="${WH}" rx="3"/>`;
       if (n && labels) {
         s += `<text class="k-name" x="${i * WK + WK / 2}" y="${WH - 10}">${n.name}</text>`;
         s += `<text class="k-int" x="${i * WK + WK / 2}" y="${WH - 27}">${n.label}</text>`;
@@ -140,7 +140,7 @@
       const n = hits.get(b);
       const x = (i + 1) * WK - BK / 2;
       const cls = n ? 'bk hit' + (n.token === '1' ? ' root' : '') + (n.upper && labels ? ' up' : '') : 'bk';
-      s += `<rect class="${cls}" x="${x}" y="-1" width="${BK}" height="${BH}" rx="2.5"/>`;
+      s += `<rect class="${cls}" ${n ? `data-midi="${b}"` : ''} x="${x}" y="-1" width="${BK}" height="${BH}" rx="2.5"/>`;
       if (n && labels) {
         s += `<text class="k-name k-on-black" x="${x + BK / 2}" y="${BH - 9}">${n.name}</text>`;
         s += `<text class="k-int k-on-black" x="${x + BK / 2}" y="${BH - 24}">${n.label}</text>`;
@@ -151,9 +151,21 @@
 
   function notePills(notes) {
     return `<ol class="pills">${notes
-      .map((n) => `<li class="pill${n.token === '1' ? ' root' : ''}${n.upper ? ' up' : ''}"><b>${n.name}</b><span>${n.label}</span></li>`)
+      .map((n) => `<li class="pill${n.token === '1' ? ' root' : ''}${n.upper ? ' up' : ''}" data-midi="${n.midi}"><b>${n.name}</b><span>${n.label}</span></li>`)
       .join('')}</ol>`;
   }
 
-  window.Render = { symHTML, staffSVG, keyboardSVG, notePills, scaleList };
+  /** Light up an element while its note sounds (restarts cleanly if the note is played again). */
+  function flashEl(el, ms) {
+    if (!el) return;
+    clearTimeout(el._flash);
+    el.classList.remove('sounding');
+    void el.getBoundingClientRect();
+    el.classList.add('sounding');
+    el._flash = setTimeout(() => el.classList.remove('sounding'), ms);
+  }
+  /** Light up every view of one note (name pill, staff note, piano key) inside `scope`. */
+  const flash = (scope, midi, ms) => scope && scope.querySelectorAll(`[data-midi="${midi}"]`).forEach((el) => flashEl(el, ms));
+
+  window.Render = { symHTML, staffSVG, keyboardSVG, notePills, scaleList, flash, flashEl };
 })();

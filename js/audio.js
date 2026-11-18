@@ -114,8 +114,9 @@
     oscs.forEach((o) => { o.start(t); o.stop(t + dur + 0.05); });
   }
 
-  /** Play MIDI notes as a chord (slight strum) or arpeggio. */
-  function play(midis, { arp = false } = {}) {
+  /** Play MIDI notes as a chord (slight strum) or arpeggio. onNote(midi, index, holdMs) is called
+      as each note actually sounds (timed from the audio clock), so the UI can light it up. */
+  function play(midis, { arp = false, onNote = null } = {}) {
     init();
     if (ctx.state !== 'running') ctx.resume().catch(() => {});
     const sorted = [...midis].sort((a, b) => a - b);
@@ -126,6 +127,10 @@
     sorted.forEach((m, i) => {
       const t = arp ? t0 + i * 0.2 : t0 + i * 0.012;
       note(m, t, arp ? 1.8 : 2.6, vel);
+      if (onNote) {
+        const lag = ((ctx.outputLatency || ctx.baseLatency || 0) + (t - ctx.currentTime)) * 1000;
+        setTimeout(() => onNote(m, i, arp ? 230 : 900), Math.max(0, lag));
+      }
     });
     return arp ? sorted.length * 200 + 1200 : 2400;
   }

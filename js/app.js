@@ -60,16 +60,23 @@
   }
 
   function stopTimers() { timers.forEach(clearTimeout); timers = []; $$('.slot.playing').forEach((s) => s.classList.remove('playing')); }
-  function playMidis(midis, arp = false) {
+  function playMidis(midis, arp = false, onNote = null) {
     if (!S.sound) return;
-    A.play(midis, { arp });
+    A.play(midis, { arp, onNote });
     const v = $('.vinyl');
     if (v) { v.classList.remove('spinning'); void v.offsetWidth; v.classList.add('spinning'); }
   }
-  const play = (notes, arp) => playMidis(notes.map((n) => n.midi), arp);
-  function playScale(root, id) {
+  // where the notes being played are drawn, so they can light up as they sound
+  const playScope = () => document.body.classList.contains('sheet-open') ? $('#lib-detail')
+    : view === 'practice' ? $('#card') : view === 'library' ? $('#lib-detail') : null;
+  const play = (notes, arp, scope = playScope()) =>
+    playMidis(notes.map((n) => n.midi), arp, scope ? (m, i, ms) => R.flash(scope, m, ms) : null);
+  /** Play a scale; `btn` is its play button, whose row of note names lights up note by note. */
+  function playScale(root, id, btn) {
     const ns = T.scaleNotes(root, id);
-    playMidis([...ns.map((n) => n.midi), ns[0].midi + 12], true);
+    const names = btn ? btn.closest('li')?.querySelectorAll('.scale-notes i') : null;
+    playMidis([...ns.map((n) => n.midi), ns[0].midi + 12], true,
+      names && names.length ? (m, i, ms) => R.flashEl(names[i % names.length], ms) : null);
   }
 
   // ───────────────────────── Practice: chord cards
@@ -654,7 +661,7 @@
     if (learnMounted || !window.Learn) return;
     learnMounted = true;
     window.Learn.mount($('#view-learn'), {
-      play: (notes, arp) => play(notes, arp),
+      play: (notes, arp, scope) => play(notes, arp, scope),
       openChord: (root, id) => {
         S.libRoot = root; S.libChord = id; S.libInv = 0; save();
         if (sheetMQ.matches) {
@@ -694,7 +701,7 @@
 
   $('#card').addEventListener('click', (e) => {
     const sc = e.target.closest('[data-scale]');
-    if (sc) { e.stopPropagation(); return playScale(card.root, sc.dataset.scale); }
+    if (sc) { e.stopPropagation(); return playScale(card.root, sc.dataset.scale, sc); }
     const slot = e.target.closest('[data-slot]');
     if (slot) {
       const i = +slot.dataset.slot;
@@ -775,7 +782,7 @@
     const iv = e.target.closest('[data-libinv]');
     if (iv) { S.libInv = +iv.dataset.libinv; save(); renderDetail(); return play(libNotes()); }
     const sc = e.target.closest('[data-scale]');
-    if (sc) playScale(S.libRoot, sc.dataset.scale);
+    if (sc) playScale(S.libRoot, sc.dataset.scale, sc);
   });
 
   document.addEventListener('keydown', (e) => {

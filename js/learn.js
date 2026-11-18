@@ -253,7 +253,7 @@
         picked[cat] = id;
         const fam = FAMILIES.find((f) => f.cat === cat);
         el.querySelector(`.fam-ex[data-fam="${cat}"]`).innerHTML = exampleHTML(fam);
-        return api.play(T.voice(root, chordById(id)));
+        return api.play(T.voice(root, chordById(id)), false, el.querySelector(`.fam-ex[data-fam="${cat}"]`));
       }
       const ft = e.target.closest('[data-ftab]');
       if (ft) {
@@ -263,7 +263,7 @@
         return;
       }
       const p = e.target.closest('[data-lplay],[data-larp]');
-      if (p) return api.play(T.voice(root, chordById(p.dataset.lplay || p.dataset.larp)), !!p.dataset.larp);
+      if (p) return api.play(T.voice(root, chordById(p.dataset.lplay || p.dataset.larp)), !!p.dataset.larp, p.closest('.fam-ex'));
       const o = e.target.closest('[data-open]');
       if (o) return api.openChord(root, o.dataset.open);
       const a = e.target.closest('.learn-toc a');
