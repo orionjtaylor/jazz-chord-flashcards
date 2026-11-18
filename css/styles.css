@@ -1622,7 +1622,7 @@ body { transition: opacity 0.18s ease-out; }
 }
 
 /* ───────── Sticky page controls, docked title, back-to-top */
-.top-title, .lib-key { display: none; }
+.lib-key { display: none; }
 .to-top {
   position: fixed; right: max(24px, env(safe-area-inset-right)); bottom: 24px; z-index: 55;
   width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; cursor: pointer; padding: 0;
@@ -1635,19 +1635,6 @@ body { transition: opacity 0.18s ease-out; }
 
 @media (max-width: 700px) {
   .to-top { right: 16px; bottom: calc(70px + max(8px, env(safe-area-inset-bottom)) + 12px); width: 44px; height: 44px; }
-
-  /* the page title docks into the top bar in place of the logo */
-  .top-title {
-    display: block; grid-column: 1; grid-row: 1; justify-self: start; align-self: center; max-width: 58vw;
-    border: 0; background: none; padding: 0; color: var(--text); cursor: pointer; text-align: left;
-    font-family: var(--f-display); font-stretch: 70%; font-weight: 900; text-transform: uppercase; font-size: 19px; line-height: 1;
-    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-    opacity: 0; transform: translateY(8px); pointer-events: none; transition: opacity 0.2s, transform 0.2s;
-  }
-  .brand { grid-row: 1; transition: opacity 0.2s, transform 0.2s; }
-  .top-actions { grid-row: 1; }
-  body.title-docked .brand { opacity: 0; transform: translateY(-8px); pointer-events: none; }
-  body.title-docked .top-title { opacity: 1; transform: none; pointer-events: auto; }
 
   /* Learn: slimmer sticky bar */
   .toc-select-wrap { padding: 6px 0 8px; }

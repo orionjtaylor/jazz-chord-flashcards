@@ -627,7 +627,7 @@
     if (v === 'library') renderLibrary();
     else if (v === 'learn') mountLearn();
     else { renderStats(); sizeCard(); }
-    requestAnimationFrame(() => onScroll());
+    requestAnimationFrame(() => { onScroll(); syncTopH(); });
     syncUrl(push);
     const target = v === 'learn' && location.hash ? document.getElementById('learn-' + location.hash.slice(1)) || document.querySelector(location.hash) : null;
     if (target) requestAnimationFrame(() => target.scrollIntoView({ block: 'start' }));
@@ -791,23 +791,20 @@
   syncTopH();
   window.addEventListener('resize', syncTopH);
   document.fonts?.ready.then(syncTopH);
+  // in the iPhone app the notch (safe-area) padding can arrive after first paint, making the
+  // top bar taller; re-measure whenever it changes so sticky bars don't slide underneath it
+  // (watch the border box: the notch space is padding, which the default content box ignores)
+  if ('ResizeObserver' in window) new ResizeObserver(syncTopH).observe($('.top'), { box: 'border-box' });
 
-  // phones: once the page's big title scrolls under the top bar, a small copy takes the logo's place
-  // (tap it to go back to the top); a back-to-top button appears on long pages
-  const PAGE_TITLES = { learn: 'How jazz chords work', library: 'The chord library' };
+  // a back-to-top button appears on long pages
   let scrollQueued = false;
   const onScroll = () => {
     scrollQueued = false;
-    const big = view !== 'practice' && $(`#view-${view} .lib-title`);
-    const docked = !!big && big.getBoundingClientRect().bottom < $('.top').offsetHeight;
-    if (docked) $('#top-title').textContent = PAGE_TITLES[view] || '';
-    document.body.classList.toggle('title-docked', docked);
     $('#to-top').classList.toggle('show', view !== 'practice' && window.scrollY > 600);
   };
   window.addEventListener('scroll', () => { if (!scrollQueued) { scrollQueued = true; requestAnimationFrame(onScroll); } }, { passive: true });
   const toTop = () => { Native.tap(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
   $('#to-top').addEventListener('click', toTop);
-  $('#top-title').addEventListener('click', toTop);
 
   setMode('spell'); // a fresh load always starts on Spell it
   route();
