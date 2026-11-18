@@ -1694,3 +1694,13 @@ body { transition: opacity 0.18s ease-out; }
   .toc-select-wrap.stuck, .lib-toolbar.stuck,
   :root[data-theme="light"] .toc-select-wrap.stuck, :root[data-theme="light"] .lib-toolbar.stuck { background: var(--ink); }
 }
+
+/* phones: slimmer sticky bars (44px: 34px controls + 4/6px padding) */
+@media (max-width: 700px) {
+  .toc-select-wrap, .lib-toolbar { padding: 4px 0 6px; }
+  .toc-select-wrap .pk-btn.toc-select, .lib-toolbar .pk-btn.fam-select, .key-select, .lib-key { height: 34px; border-radius: 10px; }
+  .toc-select-wrap .pk-btn.toc-select, .lib-toolbar .pk-btn.fam-select { font-size: 14px; padding-left: 12px; background-position: right 12px center; }
+  .key-select .pk-btn { border-radius: 0 10px 10px 0; font-size: 16px; }
+  .key-select > span { font-size: 10px; }
+  .learn-main > *, .fam, .lib-cat { scroll-margin-top: calc(var(--top-h, 55px) + 52px); }
+}
