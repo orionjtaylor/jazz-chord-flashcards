@@ -99,10 +99,10 @@
 
   /** Swipe a bottom sheet down to close it. The drag only starts when the sheet's content is
       scrolled to the top (or it starts on the handle), so scrolling inside the sheet still works. */
-  function swipeToClose(panel, onClose, { scroller } = {}) {
+  function swipeToClose(panel, onClose, { scroller, when } = {}) {
     let y0 = null, dy = 0, t0 = 0, dragging = false, allowed = false;
     panel.addEventListener('touchstart', (e) => {
-      if (e.touches.length !== 1) { y0 = null; return; }
+      if (e.touches.length !== 1 || (when && !when())) { y0 = null; return; }
       const sc = scroller ? scroller() : null;
       y0 = e.touches[0].clientY; t0 = Date.now(); dy = 0; dragging = false;
       allowed = !sc || sc.scrollTop <= 0 || !!e.target.closest('.pk-grab, .pk-title');

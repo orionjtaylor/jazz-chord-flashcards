@@ -529,8 +529,10 @@
 
   // phones/tablets: the chord detail is a bottom sheet that slides up over the list
   const sheetMQ = window.matchMedia('(max-width: 900px)');
-  function openSheet() {
+  function openSheet(modal = false) {
     if (!sheetMQ.matches) return;
+    $('#lib-detail').classList.toggle('modal', modal);
+    $('#lib-backdrop').classList.toggle('blur', modal);
     $('#lib-detail').classList.add('open');
     $('#lib-backdrop').hidden = false;
     requestAnimationFrame(() => $('#lib-backdrop').classList.add('on'));
@@ -554,7 +556,7 @@
   };
   placeDetail();
   sheetMQ.addEventListener('change', placeDetail);
-  window.Picker?.swipeToClose($('#lib-detail'), closeSheet, { scroller: () => $('#lib-detail') });
+  window.Picker?.swipeToClose($('#lib-detail'), closeSheet, { scroller: () => $('#lib-detail'), when: () => !$('#lib-detail').classList.contains('modal') });
 
   function libNotes() {
     const chord = libChord();
@@ -667,7 +669,7 @@
           // phones/tablets: open the chord sheet right here; closing it leaves you where you were
           renderDetail();
           play(libNotes());
-          openSheet();
+          openSheet(true);
           return;
         }
         setView('library');
@@ -815,7 +817,7 @@
   deckCount();
   renderStats();
   // sticky sub-bars (e.g. Learn's "Jump to") sit exactly under the top bar, whatever its height
-  const syncTopH = () => document.documentElement.style.setProperty('--top-h', $('.top').offsetHeight + 'px');
+  const syncTopH = () => document.documentElement.style.setProperty('--top-h', $('.top').getBoundingClientRect().height + 'px');
   syncTopH();
   window.addEventListener('resize', syncTopH);
   document.fonts?.ready.then(syncTopH);
@@ -831,7 +833,9 @@
     $('#to-top').classList.toggle('show', view !== 'practice' && window.scrollY > 600);
     // sticky bars are see-through until they're actually pinned under the top bar
     const bar = view === 'learn' ? $('#view-learn .toc-select-wrap') : view === 'library' ? $('#view-library .lib-toolbar') : null;
-    if (bar) bar.classList.toggle('stuck', window.scrollY > 0 && bar.getBoundingClientRect().top <= $('.top').offsetHeight + 1);
+    const stuck = !!bar && window.scrollY > 0 && bar.getBoundingClientRect().top <= $('.top').getBoundingClientRect().height + 1;
+    if (bar) bar.classList.toggle('stuck', stuck);
+    document.body.classList.toggle('bar-stuck', stuck);
   };
   window.addEventListener('scroll', () => { if (!scrollQueued) { scrollQueued = true; requestAnimationFrame(onScroll); } }, { passive: true });
   const toTop = () => { Native.tap(); window.scrollTo({ top: 0, behavior: 'smooth' }); };

@@ -1725,3 +1725,33 @@ body { transition: opacity 0.18s ease-out; }
 @media (prefers-reduced-motion: reduce) {
   .staff .nh.sounding > ellipse:first-child, .keyboard rect.sounding { transform: none; }
 }
+
+/* ───────── Phones: sticky bars span the full screen width and, once pinned, join the top bar into
+   one header (same background, one divider line underneath). They overlap the top bar by 1px so
+   no sliver of the page can show between them. */
+@media (max-width: 700px) {
+  .toc-select-wrap, .lib-toolbar {
+    top: calc(var(--top-h, 55px) - 1px);
+    margin-left: calc(-1 * clamp(16px, 4vw, 48px)); margin-right: calc(-1 * clamp(16px, 4vw, 48px));
+    padding-left: clamp(16px, 4vw, 48px); padding-right: clamp(16px, 4vw, 48px);
+    border-bottom: 1px solid transparent; transition: none; /* instant: a fade would let cards show through */
+  }
+  .toc-select-wrap.stuck, .lib-toolbar.stuck,
+  :root[data-theme="light"] .toc-select-wrap.stuck, :root[data-theme="light"] .lib-toolbar.stuck { background: var(--ink); border-bottom-color: var(--line); }
+
+  body.bar-stuck .top { border-bottom-color: transparent; }
+}
+
+/* ───────── Chord opened from Learn (phones/tablets): a centred pop-up over a dimmed, blurred page,
+   like the Deck window. The Library keeps its bottom sheet. */
+@media (max-width: 900px) {
+  .lib-backdrop.blur { -webkit-backdrop-filter: blur(4px); backdrop-filter: blur(4px); }
+  .lib-detail.modal {
+    left: 16px; right: 16px; top: 50%; bottom: auto; max-width: 560px; margin: 0 auto;
+    max-height: min(82vh, 720px); border-radius: 22px; visibility: hidden; opacity: 0;
+    transform: translateY(-50%) scale(0.96); transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.2s, visibility 0s 0.25s;
+  }
+  .lib-detail.modal.open { visibility: visible; opacity: 1; transform: translateY(-50%); transition: transform 0.25s cubic-bezier(0.2, 0.9, 0.3, 1), opacity 0.2s; }
+  .lib-detail.modal .detail-card { border-radius: 22px; padding-bottom: 22px; box-shadow: 0 24px 60px rgba(0, 0, 0, 0.5); }
+  .lib-detail.modal .detail-card::after { display: none; }
+}
