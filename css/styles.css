@@ -592,7 +592,7 @@ main { padding-left: max(clamp(16px, 4vw, 48px), env(safe-area-inset-left)); pad
 /* ───────── Learn */
 .learn-hero { display: flex; justify-content: space-between; align-items: flex-end; gap: 24px; flex-wrap: wrap; margin: 12px 0 28px; }
 .learn-root { display: flex; align-items: center; gap: 10px; color: var(--muted); font-size: 13px; font-weight: 600; }
-.learn-root select {
+.learn-root select, .learn-root .pk-btn {
   background: var(--ink-2); color: var(--text); border: 1px solid var(--line); border-radius: 10px; padding: 8px 12px;
   font: 700 16px var(--f-sym), var(--f-music);
 }
@@ -1481,8 +1481,8 @@ body { transition: opacity 0.18s ease-out; }
   .toc-select-wrap { grid-template-columns: minmax(0, 1fr) auto; gap: 8px; padding: 8px 0 10px; }
   .toc-select { padding: 9px 36px 9px 12px; font-size: 14.5px; border-radius: 11px; }
   .key-select { display: flex; align-items: center; gap: 0; background: var(--ink-2); border: 1px solid var(--line); border-radius: 11px; padding-left: 11px; }
-  .key-select span { font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
-  .key-select select {
+  .key-select > span { font-size: 10.5px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); font-weight: 700; }
+  .key-select select, .key-select .pk-btn {
     -webkit-appearance: none; appearance: none; border: 0; background: transparent; color: var(--text); padding: 7px 12px 7px 8px;
     font: 700 17px var(--f-sym), var(--f-music); min-width: 44px; text-align: center;
   }
@@ -1552,4 +1552,71 @@ body { transition: opacity 0.18s ease-out; }
   .cheat tbody { gap: 8px; }
   .cheat tr { padding: 12px 14px; gap: 6px 12px; border-radius: 14px; }
   .cheat td { font-size: 13.5px; }
+}
+
+/* ───────── Custom dropdowns (js/picker.js): the real <select> is hidden; a button opens a sheet/menu */
+.pk-native { display: none !important; }
+:where(.pk-btn) {
+  -webkit-appearance: none; appearance: none; cursor: pointer; text-align: left; min-width: 0;
+  font: 600 15px var(--f-ui); color: var(--text);
+  background: var(--ink-2) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23a39b8a' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") no-repeat right 14px center;
+  border: 1px solid var(--line); border-radius: 12px; padding: 11px 40px 11px 14px;
+}
+:where(.pk-btn) { display: flex; align-items: center; }
+.pk-btn { transition: border-color 0.15s, background-color 0.15s; }
+.pk-btn:active { background-color: var(--ink-3); }
+.pk-btn[aria-expanded="true"] { border-color: var(--gold); }
+.pk-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+.pk-val { display: flex; align-items: center; gap: 9px; min-width: 0; }
+.pk-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pk-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--c); flex: none; }
+/* key pickers: compact, chevron tucked in */
+.key-select .pk-btn, .learn-root .pk-btn { justify-content: center; background-position: right 8px center; background-size: 10px auto; padding-right: 24px; }
+.learn-root .pk-btn { padding: 8px 28px 8px 12px; }
+
+.pk-layer { position: fixed; inset: 0; z-index: 300; touch-action: none; }
+.pk-backdrop { position: absolute; inset: 0; background: rgba(5, 7, 12, 0.55); opacity: 0; transition: opacity 0.22s; }
+.pk-layer.in .pk-backdrop { opacity: 1; }
+.pk-panel { color: var(--text); }
+.pk-list { display: flex; flex-direction: column; gap: 2px; overflow-y: auto; overscroll-behavior: contain; touch-action: pan-y; min-height: 0; }
+.pk-opt {
+  display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; cursor: pointer;
+  border: 0; background: transparent; color: var(--text); font: 600 16px var(--f-ui), var(--f-music);
+  padding: 13px 12px; border-radius: 12px; -webkit-tap-highlight-color: transparent;
+}
+.pk-opt:hover, .pk-opt:focus-visible { background: var(--ink-3); outline: none; }
+.pk-opt.on { background: color-mix(in srgb, var(--gold) 15%, transparent); color: var(--gold-text); }
+.pk-check { margin-left: auto; width: 18px; height: 18px; flex: none; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.pk-grid { display: grid; grid-template-columns: repeat(var(--cols, 6), minmax(0, 1fr)); gap: 6px; }
+.pk-grid .pk-opt { justify-content: center; padding: 12px 0; font: 700 19px var(--f-sym), var(--f-music); background: var(--ink-3); border: 1px solid var(--line); }
+.pk-grid .pk-opt.on { background: var(--paper); color: var(--paper-ink); border-color: var(--paper); }
+
+/* phones: bottom sheet */
+.pk-sheet .pk-panel {
+  position: absolute; left: 0; right: 0; bottom: 0; max-height: 72vh; display: flex; flex-direction: column;
+  background: var(--ink-2); border-top: 1px solid var(--line); border-radius: 22px 22px 0 0;
+  padding: 6px 12px calc(14px + env(safe-area-inset-bottom)); box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.45);
+  transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+.pk-sheet.in .pk-panel { transform: none; }
+.pk-grab { width: 38px; height: 5px; border-radius: 3px; background: var(--muted); opacity: 0.35; margin: 4px auto 10px; flex: none; }
+.pk-title { flex: none; font: 700 11px var(--f-ui); letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); padding: 0 12px 10px; }
+
+/* larger screens: menu under the button */
+.pk-pop .pk-backdrop { background: transparent; }
+.pk-pop .pk-panel {
+  position: fixed; display: flex; flex-direction: column; overflow: hidden; max-width: calc(100vw - 16px);
+  background: var(--ink-2); border: 1px solid var(--line); border-radius: 14px; padding: 6px;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45); opacity: 0; transform: translateY(-4px); transition: opacity 0.15s, transform 0.15s;
+}
+.pk-pop.in .pk-panel { opacity: 1; transform: none; }
+.pk-pop .pk-opt { font-size: 14.5px; padding: 9px 12px; border-radius: 9px; white-space: nowrap; }
+.pk-pop .pk-grid .pk-opt { font-size: 17px; padding: 8px 10px; }
+@media (prefers-reduced-motion: reduce) { .pk-panel, .pk-backdrop { transition: none !important; } }
+/* lists with family dots: rows without a dot line their text up with the others */
+.pk-list:has(.pk-dot) .pk-opt:not(:has(.pk-dot)) .pk-text { margin-left: 19px; }
+/* key pickers keep their own background colour but still show the chevron */
+.key-select .pk-btn, .learn-root .pk-btn {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1.5l5 5 5-5' fill='none' stroke='%23a39b8a' stroke-width='1.8' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 9px center; background-size: 10px auto;
 }

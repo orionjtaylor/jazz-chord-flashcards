@@ -495,7 +495,7 @@
       `<button role="radio" aria-checked="${r === S.libRoot}" class="chip ${r === S.libRoot ? 'on' : ''}" data-libroot="${r}">${T.prettyRoot(r)}</button>`).join('');
     const fam = S.libFam && T.CATEGORIES.some((c) => c.id === S.libFam) ? S.libFam : 'all';
     $('#lib-fam-select').innerHTML = [{ id: 'all', label: 'All families' }, ...T.CATEGORIES].map((c) =>
-      `<option value="${c.id}" ${c.id === fam ? 'selected' : ''}>${c.label}</option>`).join('');
+      `<option value="${c.id}" ${c.id === fam ? 'selected' : ''} ${c.color ? `data-c="${c.color}"` : ''}>${c.label}</option>`).join('');
     $('#lib-fams').innerHTML = [{ id: 'all', label: 'All', short: 'All' }, ...T.CATEGORIES].map((c) =>
       `<button role="radio" aria-checked="${c.id === fam}" class="fam-chip ${c.id === fam ? 'on' : ''}" data-libfam="${c.id}" ${c.color ? `style="--c:${c.color}"` : ''} title="${c.label}">${c.color ? '<i></i>' : ''}<span class="lbl-long">${c.label}</span><span class="lbl-short">${c.short || c.label}</span></button>`).join('');
     $('#lib-cats').innerHTML = T.CATEGORIES.filter((cat) => fam === 'all' || cat.id === fam).map((cat) => {

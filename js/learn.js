@@ -184,20 +184,20 @@
           <p class="lib-sub">A short guide to every chord family in the app: what it is, how it sounds and where it shows up. <span class="hero-more">Tap any example to hear it.</span></p>
         </div>
         <label class="learn-root">Examples in
-          <select id="learn-root" class="learn-root-select">${T.ROOT_NAMES.map((r) => `<option value="${r}" ${r === root ? 'selected' : ''}>${T.prettyRoot(r)}</option>`).join('')}</select>
+          <select id="learn-root" class="learn-root-select" aria-label="Key for the examples" data-title="Key" data-grid="6">${T.ROOT_NAMES.map((r) => `<option value="${r}" ${r === root ? 'selected' : ''}>${T.prettyRoot(r)}</option>`).join('')}</select>
         </label>
       </div>
 
       <div class="learn-layout">
         <div class="toc-select-wrap">
-          <select class="toc-select" aria-label="Jump to section">
+          <select class="toc-select" aria-label="Jump to section" data-title="Jump to">
             <option value="learn-basics">The basics</option>
-            ${FAMILIES.map((f) => `<option value="learn-${f.cat}">${T.catOf(f.cat).label}</option>`).join('')}
+            ${FAMILIES.map((f) => `<option value="learn-${f.cat}" data-c="${T.catOf(f.cat).color}">${T.catOf(f.cat).label}</option>`).join('')}
             <option value="learn-ideas">Key ideas</option>
             <option value="learn-table">Cheat sheet</option>
           </select>
           <label class="key-select"><span>Key</span>
-            <select class="learn-root-select" aria-label="Key for the examples">${T.ROOT_NAMES.map((r) => `<option value="${r}" ${r === root ? 'selected' : ''}>${T.prettyRoot(r)}</option>`).join('')}</select>
+            <select class="learn-root-select" aria-label="Key for the examples" data-title="Key" data-grid="6">${T.ROOT_NAMES.map((r) => `<option value="${r}" ${r === root ? 'selected' : ''}>${T.prettyRoot(r)}</option>`).join('')}</select>
           </label>
         </div>
         <nav class="learn-toc" aria-label="Guide contents">
@@ -292,7 +292,7 @@
           links.forEach((l) => l.classList.remove('active'));
           links.get(en.target.id)?.classList.add('active');
           const sel = el.querySelector('.toc-select');
-          if (sel && sel.value !== en.target.id && sel.querySelector(`option[value="${en.target.id}"]`)) sel.value = en.target.id;
+          if (sel && sel.value !== en.target.id && sel.querySelector(`option[value="${en.target.id}"]`)) { sel.value = en.target.id; window.Picker?.sync(sel); }
         });
       }, { rootMargin: '-35% 0px -60% 0px' });
       links.forEach((_, id) => { const sec = el.querySelector('#' + id); if (sec) spy.observe(sec); });
@@ -303,7 +303,7 @@
       const last = [...el.querySelectorAll('.learn-toc a')].pop();
       el.querySelectorAll('.learn-toc a').forEach((l) => l.classList.toggle('active', l === last));
       const sel = el.querySelector('.toc-select');
-      if (sel) sel.value = last.getAttribute('href').slice(1);
+      if (sel) { sel.value = last.getAttribute('href').slice(1); window.Picker?.sync(sel); }
     }, { passive: true });
     watch();
     el.addEventListener('change', (e) => {
