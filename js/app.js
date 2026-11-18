@@ -75,7 +75,10 @@
   /** Play a scale; `btn` is its play button, whose row of note names lights up note by note. */
   function playScale(root, id, btn) {
     const ns = T.scaleNotes(root, id);
-    playMidis([...ns.map((n) => n.midi), ns[0].midi + 12], true);
+    const names = btn ? [...(btn.closest('li')?.querySelectorAll('.scale-notes i') || [])] : [];
+    // the top octave lights the root name again
+    playMidis([...ns.map((n) => n.midi), ns[0].midi + 12], true,
+      names.length ? (m, i, ms) => R.flashEl(names[i % names.length], ms) : null);
   }
 
   // ───────────────────────── Practice: chord cards
