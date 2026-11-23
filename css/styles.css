@@ -1833,7 +1833,7 @@ body { transition: opacity 0.18s ease-out; }
 
 /* practice: the "mastered" stat opens Progress */
 .stats .mastery { cursor: pointer; border-radius: 10px; }
-.stats .mastery .go { margin-left: 3px; color: var(--gold-text); font-size: 13px; letter-spacing: 0; }
+.stats .mastery .go { margin-left: 3px; color: var(--gold-text); font-size: 1.3em; line-height: 0; letter-spacing: 0; }
 .stats .mastery:hover dt { color: var(--text); }
 
 @media (max-width: 1000px) {
