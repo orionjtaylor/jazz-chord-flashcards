@@ -5,7 +5,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 python3 scripts/build-pages.py
 rm -rf ios-app/www && mkdir -p ios-app/www
-cp -R index.html learn.html library.html 404.html privacy.html support.html \
+cp -R index.html learn.html library.html progress.html 404.html privacy.html support.html \
       manifest.webmanifest css js fonts icons ios-app/www/
 cd ios-app
 [ -d node_modules ] || npm install --no-audit --no-fund

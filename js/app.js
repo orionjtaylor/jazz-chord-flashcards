@@ -9,7 +9,7 @@
   const defaults = {
     mode: 'spell', sound: true, best: 0, inv: 'mix',
     roots: [...T.ROOT_NAMES], cats: T.CATEGORIES.map((c) => c.id),
-    stats: {}, progStats: {}, libRoot: 'C', libChord: 'maj7', libInv: 0,
+    stats: {}, progStats: {}, days: {}, modeStats: {}, keyStats: {}, libRoot: 'C', libChord: 'maj7', libInv: 0,
   };
   const S = load();
   // the Library always opens on every family in C; a filter or key only lasts for the visit
@@ -19,7 +19,11 @@
     try { return Object.assign({}, defaults, JSON.parse(localStorage.getItem(STORE) || '{}')); }
     catch { return { ...defaults }; }
   }
-  function save() { try { localStorage.setItem(STORE, JSON.stringify(S)); } catch {} }
+  function save() {
+    const json = JSON.stringify(S);
+    try { localStorage.setItem(STORE, json); } catch {}
+    Native.backup(STORE, json); // the iPhone app also keeps a copy that iOS never clears
+  }
   // chord families added after a visitor saved their deck start switched on
   {
     const known = S.knownCats || S.cats;
@@ -350,9 +354,24 @@
     else st.box = Math.max(0, st.box - 2);
   }
 
+  /** Tally the answer by day, mode and key for the Progress view. */
+  function record(ok) {
+    const tally = (obj, k) => { const t = (obj[k] ||= [0, 0]); t[0]++; if (ok) t[1]++; };
+    const day = Progress.dayKey();
+    tally(S.days, day);
+    tally(S.modeStats, card.kind === 'prog' ? 'prog' : S.mode);
+    // in Hear it the root is random and doesn't affect the answer, so it says nothing about keys
+    if (card.kind === 'prog') tally(S.keyStats, card.key);
+    else if (S.mode !== 'hear') tally(S.keyStats, card.root);
+    // keep about a year of daily history
+    const keys = Object.keys(S.days);
+    if (keys.length > 400) keys.sort().slice(0, keys.length - 400).forEach((k) => delete S.days[k]);
+  }
+
   function grade(ok) {
     if (card.kind === 'prog') bump(S.progStats, card.prog.id, ok);
     else bump(S.stats, card.chord.id, ok);
+    record(ok);
     session.seen++;
     if (ok) { session.right++; session.streak++; S.best = Math.max(S.best, session.streak); }
     else session.streak = 0;
@@ -464,7 +483,7 @@
       <div><dt>Best</dt><dd>${S.best}</dd></div>
       <div><dt>Accuracy</dt><dd>${acc}</dd></div>
       <div><dt>Cards</dt><dd>${session.seen}</dd></div>
-      <div class="mastery"><dt><span class="lbl-long">Chords </span>mastered</dt><dd>${mastered}<small>/${T.CHORDS.length}</small></dd>
+      <div class="mastery" data-goprogress role="link" tabindex="0" aria-label="Chords mastered: ${mastered} of ${T.CHORDS.length}. See your progress"><dt><span class="lbl-long">Chords </span>mastered<span class="go" aria-hidden="true">›</span></dt><dd>${mastered}<small>/${T.CHORDS.length}</small></dd>
         <span class="mbar"><i style="width:${(mastered / T.CHORDS.length) * 100}%"></i></span></div>`;
   }
 
@@ -605,13 +624,40 @@
       </div>`;
   }
 
+  // ───────────────────────── Progress
+  /** Show a chord's details: a pop-up sheet on phones and tablets, the Library on laptops. */
+  function showChord(root, id) {
+    S.libRoot = root; S.libChord = id; S.libInv = 0; save();
+    if (sheetMQ.matches) {
+      // phones/tablets: open the chord sheet right here; closing it leaves you where you were
+      renderDetail();
+      play(libNotes());
+      openSheet(true);
+      return;
+    }
+    setView('library');
+    play(libNotes());
+    // a family filter could hide the chord; show all families so it's in the list
+    if (S.libFam && S.libFam !== 'all') { S.libFam = 'all'; save(); renderLibrary(); }
+    $(`.tile[data-chord="${CSS.escape(id)}"]`)?.scrollIntoView({ block: 'center' });
+  }
+  const progressCtx = {
+    S, box, pbox, max: MAX_BOX, isApp: Native.isApp,
+    openChord: (id) => showChord('C', id),
+    practice: () => setView('practice'),
+    reset: resetProgress,
+  };
+  function renderProgress() { Progress.render($('#view-progress'), progressCtx); }
+  Progress.bind($('#view-progress'), progressCtx);
+
   // ───────────────────────── Routing: real addresses for each section
-  const ROUTES = { practice: '/', learn: '/learn', library: '/library' };
-  const TITLES = { practice: 'Changes — Jazz Chord Flashcards', learn: 'Learn: How Jazz Chords Work · Changes', library: 'Chord Library · Changes' };
+  const ROUTES = { practice: '/', learn: '/learn', library: '/library', progress: '/progress' };
+  const TITLES = { practice: 'Changes — Jazz Chord Flashcards', learn: 'Learn: How Jazz Chords Work · Changes', library: 'Chord Library · Changes', progress: 'Your Progress · Changes' };
   function viewFromPath(path) {
     const p = path.replace(/\/+$/, '').replace(/\.html$/, '').toLowerCase();
     if (p.endsWith('/learn')) return 'learn';
     if (p.endsWith('/library')) return 'library';
+    if (p.endsWith('/progress')) return 'progress';
     return 'practice';
   }
   function urlFor(v) {
@@ -653,7 +699,9 @@
     $('#view-practice').hidden = v !== 'practice';
     $('#view-library').hidden = v !== 'library';
     $('#view-learn').hidden = v !== 'learn';
+    $('#view-progress').hidden = v !== 'progress';
     if (v === 'library') renderLibrary();
+    else if (v === 'progress') renderProgress();
     else if (v === 'learn') mountLearn();
     else { renderStats(); sizeCard(); }
     requestAnimationFrame(() => { onScroll(); syncTopH(); });
@@ -669,22 +717,7 @@
     learnMounted = true;
     window.Learn.mount($('#view-learn'), {
       play: (notes, arp, scope) => play(notes, arp, scope),
-      openChord: (root, id) => {
-        S.libRoot = root; S.libChord = id; S.libInv = 0; save();
-        if (sheetMQ.matches) {
-          // phones/tablets: open the chord sheet right here; closing it leaves you where you were
-          renderDetail();
-          play(libNotes());
-          openSheet(true);
-          return;
-        }
-        setView('library');
-        play(libNotes());
-        // a family filter could hide the chord; show all families so it's in the list
-        if (S.libFam && S.libFam !== 'all') { S.libFam = 'all'; save(); renderLibrary(); }
-        if (sheetMQ.matches) openSheet();
-        else $(`.tile[data-chord="${CSS.escape(id)}"]`)?.scrollIntoView({ block: 'center' });
-      },
+      openChord: showChord,
     });
   }
 
@@ -703,6 +736,8 @@
     if (t.dataset.view !== view) setView(t.dataset.view);
   }));
   window.addEventListener('popstate', route);
+  $('#stats').addEventListener('click', (e) => { if (e.target.closest('[data-goprogress]')) setView('progress'); });
+  $('#stats').addEventListener('keydown', (e) => { if ((e.key === 'Enter' || e.key === ' ') && e.target.closest('[data-goprogress]')) { e.preventDefault(); e.stopPropagation(); setView('progress'); } });
   $$('#mode-seg button').forEach((b) => b.addEventListener('click', () => setMode(b.dataset.mode)));
   $('#sound-btn').addEventListener('click', () => { S.sound = !S.sound; save(); renderSound(); });
 
@@ -754,11 +789,15 @@
     if (iv) S.inv = iv.dataset.inv;
     if (r || c || rq || cq || iv) { save(); renderDialog(); deckCount(); }
   });
-  $('#reset-progress').addEventListener('click', () => {
-    if (!confirm('Reset all chord progress and your best streak?')) return;
-    S.stats = {}; S.progStats = {}; S.best = 0; session.streak = session.seen = session.right = 0;
+  function resetProgress() {
+    if (!confirm('Reset all chord progress, practice history and your best run? This can\u2019t be undone.')) return false;
+    S.stats = {}; S.progStats = {}; S.days = {}; S.modeStats = {}; S.keyStats = {}; S.best = 0;
+    session.streak = session.seen = session.right = 0;
     save(); renderStats();
-  });
+    if (view === 'progress') renderProgress();
+    return true;
+  }
+  $('#reset-progress').addEventListener('click', resetProgress);
   dlg.addEventListener('close', () => { if (!S.roots.length) S.roots = [...T.ROOT_NAMES]; save(); deckCount(); card = null; newCard(); });
 
   $('#lib-roots').addEventListener('click', (e) => {
@@ -819,6 +858,7 @@
   });
 
   // ───────────────────────── Boot
+  save();
   renderSound();
   deckCount();
   renderStats();

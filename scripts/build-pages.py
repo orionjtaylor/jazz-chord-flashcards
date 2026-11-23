@@ -19,10 +19,12 @@ PAGES = {
                    "An illustrated guide to every jazz chord family: what it is, how it sounds, how it's written."),
     "library.html": ("Chord Library · Changes",
                      "Every jazz chord type in every key, with notation, keyboard, audio, inversions and scales."),
+    "progress.html": ("Your Progress · Changes",
+                      "Your jazz chord practice: day streak, accuracy over time, mastered chords and what needs work."),
     "404.html": ("Changes — Jazz Chord Flashcards", None),
 }
 
-VIEW = {"learn.html": "learn", "library.html": "library"}
+VIEW = {"learn.html": "learn", "library.html": "library", "progress.html": "progress"}
 
 def start_on(html, view):
     """Make the page show `view` from the first paint, so reloading /learn doesn't flash Practice."""

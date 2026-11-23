@@ -4,6 +4,8 @@
   const C = window.Capacitor;
   const native = !!(C && C.isNativePlatform && C.isNativePlatform());
   const P = native ? C.Plugins : {};
+  // the app's progress copy isn't written until any needed restore has happened (see below)
+  let restored = !native, pending = {};
   const safe = (fn) => { try { const r = fn(); if (r && r.catch) r.catch(() => {}); } catch {} };
 
   window.Native = {
@@ -12,8 +14,40 @@
     tap() { if (P.Haptics) safe(() => P.Haptics.impact({ style: 'LIGHT' })); },
     /** answer graded: success or error buzz */
     result(ok) { if (P.Haptics) safe(() => P.Haptics.notification({ type: ok ? 'SUCCESS' : 'ERROR' })); },
+    /** Keep a copy of saved progress in the app's own storage (iOS never clears it, and it's
+       included in the phone's iCloud/computer backups). Website: nothing to do. */
+    backup(key, value) {
+      if (!P.Preferences) return;
+      if (!restored) { pending[key] = value; return; }
+      safe(() => P.Preferences.set({ key, value }));
+    },
   };
-  if (!native) return;
+
+  // The website asks the browser to keep its saved data (it may still clear it under storage pressure).
+  if (!native) {
+    try { navigator.storage && navigator.storage.persist && navigator.storage.persist().catch(() => {}); } catch {}
+    return;
+  }
+
+  /* If iOS cleared the app's web storage (rare, when the phone is very low on space), put the
+     progress back from the app's own copy and reload. Until that check is done, nothing is
+     written to the copy, so a fresh, empty start can't overwrite real progress. */
+  const STORE = 'changes.v1';
+  let hadLocal = true;
+  try { hadLocal = localStorage.getItem(STORE) != null; } catch {}
+  const finish = () => {
+    restored = true;
+    Object.keys(pending).forEach((k) => window.Native.backup(k, pending[k]));
+    pending = {};
+  };
+  if (P.Preferences) {
+    P.Preferences.get({ key: STORE }).then(({ value }) => {
+      if (!hadLocal && value) {
+        try { localStorage.setItem(STORE, value); location.reload(); return; } catch {}
+      }
+      finish();
+    }).catch(finish);
+  }
 
   document.documentElement.classList.add('native-app');
 
