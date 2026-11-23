@@ -182,8 +182,15 @@
   }
 
   function backHTML() {
-    const { root, chord, notes, bass, inv } = card;
+    const { root, chord, notes, inv } = card;
+    // Hear it grades the quality only, so the answer is written without the slash bass;
+    // the voicing (which note was on the bottom) is mentioned, not spelled into the symbol
+    const hear = S.mode === 'hear';
+    const bass = hear ? null : card.bass;
     const cat = T.catOf(chord.cat);
+    const invLine = !T.canInvert(chord) ? ''
+      : hear ? (inv ? `<p class="inv-name">Played with the ${T.invName(chord, inv).split(' · ')[1].replace(' in the bass', '')} on the bottom</p>` : '')
+      : `<p class="inv-name ${inv ? 'is-inv' : ''}">${T.invName(chord, inv)}</p>`;
     return `<div class="back-wrap">
       <div class="back-head">
         <div class="back-sym">${R.symHTML(root, chord, bass)}</div>
@@ -191,7 +198,7 @@
           <span class="tag" style="--c:${cat.color}">${cat.label}</span>
           <h2>${T.title(root, chord)}</h2>
           ${chord.equiv ? `<p class="equiv">≈ ${chord.equiv}</p>` : ''}
-          ${T.canInvert(chord) ? `<p class="inv-name ${inv ? 'is-inv' : ''}">${T.invName(chord, inv)}</p>` : ''}
+          ${invLine}
           ${chord.alts.length ? `<p class="alts">Also written ${chord.alts.map((a) => `<span>${T.prettyRoot(root)}${T.pretty(a)}${bass ? '/' + bass.name : ''}</span>`).join('')}</p>` : ''}
         </div>
         <div class="back-play">
@@ -729,7 +736,13 @@
 
   // ───────────────────────── Events
   // nav links: normal clicks switch in place; ⌘/Ctrl/middle-click still open a new tab
-  $$('.tab, .brand').forEach((t) => t.addEventListener('click', (e) => {
+  // the Changes logo reloads the app fresh on Practice (also undoes any accidental zoom)
+  $('.brand').addEventListener('click', (e) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    e.preventDefault();
+    location.assign('/');
+  });
+  $$('.tab').forEach((t) => t.addEventListener('click', (e) => {
     if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
     e.preventDefault();
     if (t.dataset.view === 'learn' && view !== 'learn') history.replaceState(history.state, '', location.pathname + location.search); // drop any old #section

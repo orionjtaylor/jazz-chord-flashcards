@@ -58,7 +58,7 @@
     C('9', '9', 'Dominant ninth', 'dominant', ['1', '3', '5', 'b7', '9'], ['dom9'], 'A dominant 7 with a natural 9th: the bluesy, funky dominant.'),
     C('11', '11', 'Dominant eleventh', 'dominant', ['1', '5', 'b7', '9', '11'], ['dom11'], 'The 3rd is usually dropped, so it sounds like a 9sus4.'),
     C('13', '13', 'Dominant thirteenth', 'dominant', ['1', '3', '5', 'b7', '9', '13'], ['dom13'], 'The classic big-band dominant. The 13 sits a whole step above the 5th.'),
-    C('7#11', '7#11', 'Dominant seven sharp eleven', 'dominant', ['1', '3', '5', 'b7', '#11'], ['7(♯11)', '7♭5'], 'The Lydian dominant. Common on ♭VII7 and on tritone subs.'),
+    C('7#11', '7#11', 'Dominant seven sharp eleven', 'dominant', ['1', '3', '5', 'b7', '#11'], ['7(♯11)'], 'The Lydian dominant. Common on ♭VII7 and on tritone subs.'),
     C('9#11', '9#11', 'Dominant nine sharp eleven', 'dominant', ['1', '3', '5', 'b7', '9', '#11'], ['9(♯11)'], 'Lydian dominant with the 9th.'),
     C('13#11', '13#11', 'Dominant thirteen sharp eleven', 'dominant', ['1', '3', '5', 'b7', '9', '#11', '13'], ['13(♯11)'], 'All of Lydian dominant (melodic minor\'s 4th mode) stacked in thirds.'),
     C('7b5', '7b5', 'Dominant seven flat five', 'dominant', ['1', '3', 'b5', 'b7'], ['7(♭5)'], 'Symmetrical: it\'s the same chord a tritone away. Good for tritone substitution.'),
@@ -77,10 +77,10 @@
     C('7alt', '7alt', 'Altered dominant', 'altered', ['1', '3', 'b7', '#9', 'b13'], ['7(alt)', '7♯9♭13'], 'A catch-all for a crunchy altered dominant: use any mix of ♭9, ♯9, ♯11 (♭5) and ♭13 (♯5), all from the altered (super Locrian) scale. Shown here in a common voicing: 1 3 ♭7 ♯9 ♭13.'),
 
     // ── Suspended
-    C('sus2', 'sus2', 'Suspended second', 'sus', ['1', '2', '5'], ['sus9'], 'The 3rd is replaced by the 2nd, so it is neither major nor minor.'),
+    C('sus2', 'sus2', 'Suspended second', 'sus', ['1', '2', '5'], ['sus(add9)'], 'The 3rd is replaced by the 2nd, so it is neither major nor minor.'),
     C('sus4', 'sus4', 'Suspended fourth', 'sus', ['1', '4', '5'], ['sus'], 'The 3rd is replaced by the 4th, which traditionally resolves down.'),
     C('7sus4', '7sus4', 'Seven sus four', 'sus', ['1', '4', '5', 'b7'], ['7sus'], 'A dominant without its tritone. Floats rather than pulls.'),
-    C('9sus4', '9sus4', 'Nine sus four', 'sus', ['1', '4', '5', 'b7', '9'], ['9sus', 'IV/V'], 'A modern V chord, also written as IV/V (e.g. F/G). Herbie Hancock territory.'),
+    C('9sus4', '9sus4', 'Nine sus four', 'sus', ['1', '4', '5', 'b7', '9'], ['9sus', '11'], 'A modern V chord, also written as IV/V (e.g. F/G). Herbie Hancock territory.'),
     C('13sus4', '13sus4', 'Thirteen sus four', 'sus', ['1', '4', '5', 'b7', '9', '13'], ['13sus'], 'A sus chord with everything stacked on top. Lush and open.'),
     C('7sus4b9', '7sus4b9', 'Sus flat nine (Phrygian)', 'sus', ['1', '4', '5', 'b7', 'b9'], ['sus♭9', '7sus(♭9)'], 'The Phrygian chord: dark and exotic. Heard all over modal jazz.'),
 
@@ -100,7 +100,7 @@
     // ── More chords found on real charts
     C('maj7b5', 'maj7b5', 'Major seven flat five', 'major', ['1', '3', 'b5', '7'], ['Δ7♭5', 'maj7(♭5)'], 'A Lydian sound with the ♯11 (♭5) replacing the 5th.'),
     C('69#11', '6/9#11', 'Six-nine sharp eleven', 'major', ['1', '3', '5', '6', '9', '#11'], ['6/9(♯11)'], 'A Lydian tonic without the major 7th. A favorite final chord.'),
-    C('mb6', 'm(b6)', 'Minor flat six', 'minor', ['1', 'b3', '5', 'b6'], ['-♭6', 'm(♯5)'], 'Aeolian minor. The ♭6 moving to 5 drives many minor-key lines.'),
+    C('mb6', 'm(b6)', 'Minor flat six', 'minor', ['1', 'b3', '5', 'b6'], ['-♭6', 'm(add♭6)'], 'Aeolian minor. The ♭6 moving to 5 drives many minor-key lines.'),
     C('m7b9', 'm7b9', 'Minor seven flat nine', 'minor', ['1', 'b3', '5', 'b7', 'b9'], ['-7♭9', 'mi7(♭9)'], 'The Phrygian minor chord, as on the iii of a major key.'),
     C('m7#5', 'm7#5', 'Minor seven sharp five', 'minor', ['1', 'b3', '#5', 'b7'], ['-7♯5', 'm7(♭13)'], 'Aeolian color. It sounds like a major 7 chord in first inversion.'),
     C('7add13', '7(13)', 'Dominant seven add thirteen', 'dominant', ['1', '3', '5', 'b7', '13'], ['7/6', '7add13'], 'A dominant with the 13th but no 9th. Common in big-band voicings.'),
@@ -121,7 +121,7 @@
   });
   CHORDS.push(
     SL('sl-bVII', 'slash', '', 'b7', 'maj', '♭VII/I', '♭VII triad over the root', ['9sus4', '11'], '9sus4 without the 5th', 'For example F/G: the modern "sus" dominant in Herbie Hancock\'s style. It often replaces V7.'),
-    SL('sl-v', 'slash', '', '5', 'min', 'v/I', 'Minor v triad over the root', ['9(no3)'], 'A dominant 9 with no 3rd', 'For example Gm/C: open and ambiguous, like a sus chord.'),
+    SL('sl-v', 'slash', '', '5', 'min', 'v/I', 'Minor v triad over the root', ['9(no3)'], 'a dominant 9th with no 3rd', 'For example Gm/C: open and ambiguous, like a sus chord.'),
     SL('sl-bvii', 'slash', '', 'b7', 'min', '♭vii/I', 'Minor ♭vii triad over the root', ['7sus4♭9', 'sus♭9'], '7sus4♭9 (Phrygian)', 'For example Fm/G: the Phrygian sus♭9 sound written as a hybrid chord.'),
     SL('sl-II', 'slash', '', '2', 'maj', 'II/I', 'II triad over the root', [], 'Lydian: maj7♯11 color without the 3rd or 7th', 'For example D/C: a bright, floating Lydian sound. Very common in modern jazz and film music.'),
     SL('sl-V', 'slash', '', '5', 'maj', 'V/I', 'V triad over the root', ['maj9(no3)'], 'maj9 without the 3rd', 'For example G/C: an open, modern major sound with the 7th and 9th on top.'),
@@ -195,7 +195,7 @@
     '7b5b9': ['hwdim', 'altered'], '7b5#9': ['altered', 'hwdim'], '13#9': ['hwdim'], '9b13': ['mixob6'], 5: ['minpent', 'mixolydian', 'aeolian'],
     'sl-bVII': ['mixolydian'], 'sl-v': ['mixolydian', 'dorian'], 'sl-bvii': ['phrygian', 'dorianb2'], 'sl-II': ['lydian'],
     'sl-V': ['ionian', 'lydian'], 'sl-bII': ['phrygian'], 'sl-III': ['lydaug'],
-    'us-II': ['lyddom'], 'us-bIII': ['altered', 'hwdim'], 'us-biii': ['altered'], 'us-bV': ['hwdim'], 'us-bVI': ['altered'], 'us-VI': ['hwdim'],
+    'us-II': ['lyddom'], 'us-bIII': ['hwdim', 'altered'], 'us-biii': ['altered'], 'us-bV': ['hwdim'], 'us-bVI': ['altered'], 'us-VI': ['hwdim'],
   };
 
   // ── Progressions: [degree token from key, chord id, roman numeral]
@@ -220,7 +220,7 @@
     P('tuneup', 'Descending ii–Vs', 'major', [['3', 'm7', 'iii7'], ['6', '7', 'VI7'], ['2', 'maj7', 'IImaj7'], ['2', 'm7', 'ii7'], ['5', '7', 'V7'], ['1', 'maj7', 'Imaj7']], 'A ii–V–I a whole step up, then the same pattern landing home, as in "Tune Up" and "Solar".'),
     P('ladybird', 'Lady Bird turnaround', 'major', [['1', 'maj7', 'Imaj7'], ['b3', 'maj7', '♭IIImaj7'], ['b6', 'maj7', '♭VImaj7'], ['b2', 'maj7', '♭IImaj7']], 'Tadd Dameron\'s turnaround: major 7th chords moving by major 3rds and down a half step home.'),
     P('sus251', 'Modern ii–V–I with a sus dominant', 'major', [['2', 'm9', 'ii9'], ['5', 'sl-bVII', 'IV/V'], ['1', 'maj9', 'Imaj9']], 'The V7 becomes a hybrid IV/V (a sus dominant): a standard modern substitution with an open, unresolved sound.'),
-    P('ust251', 'Upper-structure ii–V–I', 'major', [['2', 'm7', 'ii7'], ['5', 'us-bVI', '♭III/V7'], ['1', '69', 'I6/9']], 'An altered dominant voiced as a triad over V7, resolving to a 6/9.'),
+    P('ust251', 'Upper-structure ii–V–I', 'major', [['2', 'm7', 'ii7'], ['5', 'us-bVI', '♭III/V7'], ['1', '69', 'I6/9']], 'An altered dominant voiced as a triad over V7, resolving to a 6/9. The numeral counts from the key: in C the top triad is E♭ (♭III of C), which is upper structure ♭VI of the G7 underneath, adding its ♭13 and ♯9.'),
   ];
 
   const ACC = { '-2': '𝄫', '-1': '♭', '0': '', '1': '♯', '2': '𝄪' };
@@ -349,11 +349,12 @@
   const catOf = (id) => CATEGORIES.find((c) => c.id === id);
 
   /** Upper triad root (ASCII name) for a hybrid chord over a given bass, respelled the way charts write it. */
+  /** The upper triad's root, spelled by its interval above the bass (II over F♯ is G♯, not A♭), so
+      every note keeps the right letter for its label, as in the plain chords (F♯maj7 has E♯). Only a
+      root that would need a double sharp or flat is respelled to its everyday name. */
   function upperRoot(bassName, chord) {
     const [ur] = spell(bassName, [chord.upper.tok]);
-    const awkward = (n) => Math.abs(n.acc) > 1 || ['Cb', 'Fb', 'E#', 'B#'].includes(n.ascii);
-    const triadAwkward = spell(ur.ascii, TRIADS[chord.upper.q]).some(awkward);
-    return awkward(ur) || triadAwkward ? ROOT_NAMES[ur.pc] : ur.ascii;
+    return Math.abs(ur.acc) > 1 ? ROOT_NAMES[ur.pc] : ur.ascii;
   }
   /** Human title, e.g. "E♭ dominant seventh" or "F major over G". */
   function title(root, chord) {

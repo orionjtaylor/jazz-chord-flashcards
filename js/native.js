@@ -51,6 +51,11 @@
 
   document.documentElement.classList.add('native-app');
 
+  // an app shouldn't pinch-zoom: it's easy to do by accident and hard to undo. (The website keeps
+  // zoom for accessibility; in the app, text size follows the iPhone's own settings.)
+  const vp = document.querySelector('meta[name="viewport"]');
+  if (vp) vp.setAttribute('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover');
+
   // status bar text follows the theme (light text on the dark theme, dark text on the light one)
   const syncBar = () => {
     if (!P.StatusBar) return;

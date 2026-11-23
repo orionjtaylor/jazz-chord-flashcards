@@ -68,11 +68,11 @@
     const rows = MODES.map((m) => {
       const [n, r] = ms[m.id] || [0, 0];
       const p = pct(r, n);
-      return `<li><span class="pg-row-name"><b>${m.label}</b><small>${m.sub}</small></span>
+      return `<li><span class="pg-row-name"><b>${m.label}</b><small>${n.toLocaleString()} card${n === 1 ? '' : 's'}</small></span>
         <span class="pg-row-bar"><i style="width:${p || 0}%"></i></span>
-        <span class="pg-row-val"><b>${fmtPct(p)}</b><small>${n} card${n === 1 ? '' : 's'}</small></span></li>`;
+        <span class="pg-row-val">${fmtPct(p)}</span></li>`;
     }).join('');
-    return `<section class="pg-panel"><div class="pg-panel-head"><h2>By practice mode</h2></div><ul class="pg-rows">${rows}</ul></section>`;
+    return `<section class="pg-panel"><div class="pg-panel-head"><h2>By mode</h2><p class="pg-note">Accuracy</p></div><ul class="pg-rows">${rows}</ul></section>`;
   }
 
   function families(box) {
@@ -81,11 +81,11 @@
       const levels = list.map((c) => box(c.id));
       const mastered = levels.filter((l) => l >= 4).length;
       const avg = levels.reduce((a, b) => a + b, 0) / (list.length * 5);
-      return `<li style="--c:${cat.color}"><span class="pg-row-name"><b><i class="pg-dot"></i>${PHONE_NAME[cat.id] ? `<span class="lbl-long">${cat.label}</span><span class="lbl-short">${PHONE_NAME[cat.id]}</span>` : cat.label}</b></span>
+      return `<li style="--c:${cat.color}"><span class="pg-row-name"><b><i class="pg-dot"></i>${cat.id === 'dim' ? 'Diminished' : PHONE_NAME[cat.id] ? `<span class="lbl-long">${cat.label}</span><span class="lbl-short">${PHONE_NAME[cat.id]}</span>` : cat.label}</b></span>
         <span class="pg-row-bar pg-fambar"><i style="width:${avg * 100}%"></i></span>
-        <span class="pg-row-val"><b>${mastered}<small>/${list.length}</small></b><small>mastered</small></span></li>`;
+        <span class="pg-row-val">${mastered}<small>/${list.length}</small></span></li>`;
     }).join('');
-    return `<section class="pg-panel"><div class="pg-panel-head"><h2>Chord families</h2><p class="pg-note">Bar = average level</p></div><ul class="pg-rows">${rows}</ul></section>`;
+    return `<section class="pg-panel"><div class="pg-panel-head"><h2>Chord families</h2><p class="pg-note">Mastered</p></div><ul class="pg-rows pg-fams">${rows}</ul></section>`;
   }
 
   function weakest(S, max) {
@@ -101,7 +101,7 @@
           return `<button class="pg-weak-tile" data-pgchord="${c.id}" style="--c:${cat.color}">
             <span class="tile-sym">${R.symHTML('C', c)}</span>
             <span class="pg-weak-name">${c.name}</span>
-            <span class="pg-weak-stat">${Math.round(p * 100)}% · ${st.seen} tr${st.seen === 1 ? 'y' : 'ies'}</span>
+            <span class="pg-weak-stat">${Math.round(p * 100)}% right · ${st.seen}×</span>
             <span class="pg-pips" aria-label="Level ${st.box} of ${max}">${Array.from({ length: max }, (_, i) => `<i class="${i < st.box ? 'on' : ''}"></i>`).join('')}</span>
           </button>`;
         }).join('')}</div>`
@@ -117,7 +117,7 @@
       const tone = p == null ? '' : p >= 85 ? 'good' : p >= 65 ? 'mid' : 'low';
       return `<li class="pg-key ${tone}" title="${T.prettyRoot(k)}: ${n ? `${p}% of ${n}` : 'not practiced'}"><b>${T.prettyRoot(k)}</b><small>${fmtPct(p)}</small></li>`;
     }).join('');
-    return `<section class="pg-panel"><div class="pg-panel-head"><h2>By key</h2><p class="pg-note">Spell, Name &amp; Progressions</p></div><ol class="pg-keys">${cells}</ol></section>`;
+    return `<section class="pg-panel"><div class="pg-panel-head"><h2>By key</h2><p class="pg-note">Accuracy · Hear not counted</p></div><ol class="pg-keys">${cells}</ol></section>`;
   }
 
   function how(max) {
@@ -149,17 +149,21 @@
     const practicedDays = Object.keys(days).length;
     const where = ctx.isApp ? 'Saved on this iPhone' : 'Saved in this browser';
 
-    const tiles = `<dl class="pg-tiles">
-      <div class="pg-tile hero"><dt>Day streak</dt><dd>${streak}<small> day${streak === 1 ? '' : 's'}</small></dd>
-        <span class="pg-tile-sub">${days[dayKey()] ? 'Practiced today' : streak ? 'Practice today to keep it going' : practicedDays ? 'Start a new one today' : 'Practice today to start one'}</span></div>
-      <div class="pg-tile"><dt>Chords mastered</dt><dd>${mastered}<small>/${T.CHORDS.length}</small></dd>
-        <span class="mbar"><i style="width:${(mastered / T.CHORDS.length) * 100}%"></i></span></div>
-      <div class="pg-tile"><dt>Progressions mastered</dt><dd>${pMastered}<small>/${T.PROGRESSIONS.length}</small></dd>
-        <span class="mbar"><i style="width:${(pMastered / T.PROGRESSIONS.length) * 100}%"></i></span></div>
-      <div class="pg-tile"><dt>Cards answered</dt><dd>${total.toLocaleString()}</dd></div>
-      <div class="pg-tile"><dt>Accuracy</dt><dd>${fmtPct(pct(right, total))}</dd></div>
-      <div class="pg-tile"><dt>Best run</dt><dd>${S.best}<small> in a row</small></dd></div>
-    </dl>`;
+    const stat = (label, val, bar) => `<div class="pg-stat"><dt>${label}</dt><dd>${val}</dd>${bar == null ? '' : `<span class="pg-meter"><i style="width:${bar * 100}%"></i></span>`}</div>`;
+    const tiles = `<section class="pg-panel pg-summary">
+      <div class="pg-streak">
+        <span class="pg-label">Day streak</span>
+        <b class="pg-streak-n">${streak}<small> day${streak === 1 ? '' : 's'}</small></b>
+        <span class="pg-streak-sub">${days[dayKey()] ? 'Practiced today' : streak ? 'Practice today to keep it going' : practicedDays ? 'Start a new one today' : 'Practice today to start one'}</span>
+        <span class="pg-streak-sub">Best run: <b>${S.best}</b> in a row</span>
+      </div>
+      <dl class="pg-stats">
+        ${stat('Chords mastered', `${mastered}<small>/${T.CHORDS.length}</small>`, mastered / T.CHORDS.length)}
+        ${stat('Progressions', `${pMastered}<small>/${T.PROGRESSIONS.length}</small>`, pMastered / T.PROGRESSIONS.length)}
+        ${stat('Cards answered', total.toLocaleString())}
+        ${stat('Accuracy', fmtPct(pct(right, total)))}
+      </dl>
+    </section>`;
 
     const empty = !total
       ? `<div class="pg-start"><p>Answer a few cards and your progress shows up here.</p><button class="btn primary" data-pgact="practice">Start practicing</button></div>`
@@ -173,13 +177,15 @@
         </div>
       </div>
       ${empty}
-      ${tiles}
       <div class="pg-grid">
+        ${tiles}
         ${chart(days)}
         ${weakest(S, max)}
-        ${modes(S.modeStats || {})}
-        ${keys(S.keyStats || {})}
         ${families(box)}
+        <div class="pg-pair">
+          ${modes(S.modeStats || {})}
+          ${keys(S.keyStats || {})}
+        </div>
         ${how(max)}
       </div>
       <p class="pg-reset"><button type="button" class="link-btn" data-pgact="reset">Reset all progress</button></p>`;
